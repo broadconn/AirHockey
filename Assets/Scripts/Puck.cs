@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class Puck : MonoBehaviour
 {
-    Rigidbody rb;
     [SerializeField] float maxSpeed = 20;
     [SerializeField] float minSpeed = 2;
+    [SerializeField] TrailRenderer trail;
+    Rigidbody rb;
 
     // Start is called before the first frame update
     void Start()
@@ -32,5 +33,16 @@ public class Puck : MonoBehaviour
             var s = rb.velocity.normalized * minSpeed;
             rb.velocity = s;
         }
+    }
+
+    public void ResetToPosition(Vector3 pos) {
+        transform.position = pos;
+        trail.Clear();
+        ZeroVelocity();
+    }
+
+    private void ZeroVelocity() {
+        rb = rb != null ? rb : GetComponent<Rigidbody>();
+        rb.velocity = Vector3.zero;
     }
 }

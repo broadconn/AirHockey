@@ -15,7 +15,7 @@ public class PlayerMallet : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Cursor.visible = false; 
+        Cursor.visible = false; 
         rb = GetComponent<Rigidbody>();
         tgtPos = transform.position;
     }
