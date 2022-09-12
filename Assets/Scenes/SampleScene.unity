@@ -3338,7 +3338,7 @@ GameObject:
   - component: {fileID: 2088203992}
   - component: {fileID: 2088203991}
   - component: {fileID: 2088203990}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: FloorCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
