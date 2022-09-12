@@ -35,8 +35,19 @@ public class PlayerMallet : MonoBehaviour
         int layerMask = 1 << mouseAreaColliderLayer; // only cast rays against the P1 mouse area collider
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 10, layerMask)) {
-            tgtPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
+            Vector3 hitWorldPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
+            tgtPos = ClosestPointOnMeshOBB(malletArea, hitWorldPos);
             Debug.DrawRay(camera.transform.position, (tgtPos - camera.transform.position) * 100, Color.yellow);
         }
+    }
+    Vector3 ClosestPointOnMeshOBB(MeshFilter meshFilter, Vector3 worldPoint) {
+        // First, we transform the point into the local coordinate space of the mesh.
+        var localPoint = meshFilter.transform.InverseTransformPoint(worldPoint);
+
+        // Next, we compare it against the mesh's axis-aligned bounds in its local space.
+        var localClosest = meshFilter.sharedMesh.bounds.ClosestPoint(localPoint);
+
+        // Finally, we transform the local point back into world space.
+        return meshFilter.transform.TransformPoint(localClosest);
     }
 }
