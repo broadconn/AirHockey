@@ -94,8 +94,8 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _Blend: 0
-    - _BorderFade: 0.12
-    - _BorderFadeSharpness: 11.09
+    - _BorderFade: 0.2
+    - _BorderFadeSharpness: 6.2
     - _BumpScale: 1
     - _CellSpacing: 2.5
     - _CenterlineFade: 0.02
@@ -120,7 +120,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Sharp: 0.4
+    - _Sharp: 1
     - _Sharpness: 300
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0

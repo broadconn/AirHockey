@@ -95,7 +95,7 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BorderFade: 0.21
-    - _BorderFadeSharpness: 4.83
+    - _BorderFadeSharpness: 6.23
     - _BumpScale: 1
     - _CellSpacing: 2.37
     - _CenterlineFade: 0.02
@@ -120,7 +120,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Sharp: 0.4
+    - _Sharp: 1
     - _Sharpness: 302.95
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
