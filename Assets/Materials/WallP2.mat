@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: WallP2
-  m_Shader: {fileID: -6465566751694194690, guid: e60932784ccf6b146aa97d28983bdd3c,
+  m_Shader: {fileID: -6465566751694194690, guid: 4979daac3ef4d5f46a5fb88762fcfdbf,
     type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -94,9 +94,13 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _Blend: 0
-    - _BorderSize: 0.1
+    - _BorderFade: 1.4
+    - _BorderFadeSharpness: 1.13
     - _BumpScale: 1
     - _CellSpacing: 2.5
+    - _CenterlineFade: 0.77
+    - _CenterlineSharpness: 0.15
+    - _CircleSize: 2
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -104,21 +108,25 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _EdgesSharp: 10
-    - _EdgesSize: 0.005
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
+    - _NoiseMin: 0.21
+    - _NoiseMod: -0.09
+    - _NoiseSize: 11.88
+    - _NumCells: 100.07
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _Sharp: 1.6
     - _Sharpness: 300
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
+    - _Spacing: 6.48
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
@@ -127,9 +135,12 @@ Material:
     - _Zoom: 0.002
     m_Colors:
     - _BaseColor: {r: 0.01886791, g: 0.01886791, b: 0.01886791, a: 1}
-    - _Color: {r: 12.996038, g: 0, b: 0, a: 1}
-    - _Color2: {r: 1, g: 0, b: 0, a: 1}
+    - _CenterlineColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Color: {r: 0, g: 0, b: 0, a: 0}
+    - _Color2: {r: 8.47419, g: 0.17746994, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Noise2Direction: {r: 0, g: 0, b: 0, a: 0}
+    - _NoiseDirection: {r: 1, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _UV_Squish: {r: 1, g: 1, b: 0, a: 0}
+    - _UV_Squish: {r: 4.38, g: 6.85, b: 0, a: 0}
   m_BuildTextureStacks: []

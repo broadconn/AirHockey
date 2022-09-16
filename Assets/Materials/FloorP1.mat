@@ -99,7 +99,7 @@ Material:
     - _BumpScale: 1
     - _CellSpacing: 2.37
     - _CenterlineFade: 0.02
-    - _CenterlineSharpness: 41.22
+    - _CenterlineSharpness: 9.67
     - _CircleSize: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
