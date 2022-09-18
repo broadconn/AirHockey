@@ -20,16 +20,16 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GoalP1
-  m_Shader: {fileID: -6465566751694194690, guid: bb62cebf722f65448aa9c1202f9d4f02,
-    type: 3}
+  m_Name: GoalFloor
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
+  m_CustomRenderQueue: 2000
+  stringTagMap:
+    RenderType: Opaque
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -94,6 +94,7 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _Blend: 0
+    - _BlendOp: 0
     - _BorderFade: 0.03
     - _BorderFadeSharpness: 111.76
     - _BorderSize: 0.04
@@ -116,13 +117,14 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _NoiseSize: 0
+    - _NoiseSize: 5
     - _NumCells: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _SampleGI: 0
     - _Sharp: 1
     - _Sharpness: 75.61
     - _Smoothness: 0.5
@@ -135,10 +137,10 @@ Material:
     - _ZWrite: 1
     - _Zoom: 1
     m_Colors:
-    - _BaseColor: {r: 0.01886791, g: 0.01886791, b: 0.01886791, a: 1}
-    - _CenterlineColor: {r: 0.031372532, g: 0.26585862, b: 0.5686275, a: 1}
-    - _Color: {r: 0, g: 0.5592723, b: 1, a: 1}
-    - _Color2: {r: 0, g: 4.0053186, b: 14.343096, a: 1}
+    - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
+    - _CenterlineColor: {r: 0.029719934, g: 0.56765074, b: 0.56765074, a: 1}
+    - _Color: {r: 0, g: 0, b: 0, a: 1}
+    - _Color2: {r: 0.87814873, g: 0, b: 14.343097, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _NoiseDirection: {r: 0, g: 1, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}

@@ -101,6 +101,7 @@ Material:
     - _CellSpacing: 1
     - _CenterlineFade: 2
     - _CenterlineSharpness: 1
+    - _CircleSize: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -115,6 +116,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
+    - _NoiseSize: 5
     - _NumCells: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -134,10 +136,11 @@ Material:
     - _Zoom: 1
     m_Colors:
     - _BaseColor: {r: 0.01886791, g: 0.01886791, b: 0.01886791, a: 1}
-    - _CenterlineColor: {r: 0.7490196, g: 0.047058824, b: 0.039215688, a: 1}
-    - _Color: {r: 0.83137256, g: 0.31283718, b: 0.074509785, a: 1}
-    - _Color2: {r: 0.9607843, g: 0.027655387, b: 0, a: 1}
+    - _CenterlineColor: {r: 0.5283019, g: 0.0058375895, b: 0, a: 1}
+    - _Color: {r: 0, g: 0, b: 0, a: 1}
+    - _Color2: {r: 0.0007314645, g: 0.00069699757, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _NoiseDirection: {r: 0, g: 1, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _UV_Squish: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
