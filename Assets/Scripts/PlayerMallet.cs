@@ -37,6 +37,8 @@ public class PlayerMallet : MonoBehaviour
 
     void UpdateTgtPos() {
         int layerMask = 1 << mouseAreaColliderLayer; // only cast rays against the P1 mouse area collider
+
+        // try to go to the world position the mouse points to
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 1000, layerMask)) {
             Vector3 hitWorldPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);

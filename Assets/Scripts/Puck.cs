@@ -5,9 +5,8 @@ public class Puck : MonoBehaviour {
 
     public Rigidbody Rb { get => rb; }
     Rigidbody rb; 
-
-    // Start is called before the first frame update
-    void Start()
+     
+    void Awake()
     {
         rb = GetComponent<Rigidbody>();
     }
