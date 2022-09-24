@@ -1,6 +1,7 @@
 using Assets.Scripts.AI;
 using System;
 using UnityEngine;
+using static UnityEditor.Rendering.InspectorCurveEditor;
 
 public class AIMallet : MonoBehaviour
 {
@@ -88,7 +89,8 @@ public class AIMallet : MonoBehaviour
             desiredPos = ambleCenter + amble;
         }
         //if puck is travelling towards our zone, move to an interception point
-        else { 
+        else {
+            curState = AIMalletState.Intercepting;
             desiredPos = futurePuckPos;
         }
 
