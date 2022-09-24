@@ -136,7 +136,7 @@ Material:
     - _Zoom: 1
     m_Colors:
     - _BaseColor: {r: 0.01886791, g: 0.01886791, b: 0.01886791, a: 1}
-    - _CenterlineColor: {r: 0.5283019, g: 0.0058375895, b: 0, a: 1}
+    - _CenterlineColor: {r: 1.216269, g: 0.0090094, b: 0, a: 1}
     - _Color: {r: 0, g: 0, b: 0, a: 1}
     - _Color2: {r: 0.0007314645, g: 0.00069699757, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

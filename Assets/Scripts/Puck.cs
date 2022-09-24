@@ -1,13 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Puck : MonoBehaviour
-{
-    [SerializeField] float maxSpeed = 20;
-    [SerializeField] float minSpeed = 2;
+public class Puck : MonoBehaviour {
     [SerializeField] TrailRenderer trail;
-    Rigidbody rb;
+
+    public Rigidbody Rb { get => rb; }
+    Rigidbody rb; 
 
     // Start is called before the first frame update
     void Start()
@@ -22,15 +19,15 @@ public class Puck : MonoBehaviour
 
     private void FixedUpdate() { 
         // max speed
-        if (rb.velocity.magnitude > maxSpeed) {
-            var s = rb.velocity.normalized * maxSpeed;
+        if (rb.velocity.magnitude > GameController.Instance.PuckMaxSpeed) {
+            var s = rb.velocity.normalized * GameController.Instance.PuckMaxSpeed;
             rb.velocity = s;
         }
 
         // min speed
         if (rb.velocity.magnitude > 0 // only enforce if the puck be moving already
-            && rb.velocity.magnitude < minSpeed) {
-            var s = rb.velocity.normalized * minSpeed;
+            && rb.velocity.magnitude < GameController.Instance.PuckMinSpeed) {
+            var s = rb.velocity.normalized * GameController.Instance.PuckMinSpeed;
             rb.velocity = s;
         }
     }

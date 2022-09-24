@@ -7,15 +7,17 @@ public class PlayerMallet : MonoBehaviour
 {
     [SerializeField] new Camera camera;
     [SerializeField] MeshFilter malletArea;
-    [SerializeField] int malletSpeed = 40;
+
+    public Rigidbody Rb { get => rb; } 
     Rigidbody rb;
+
     Vector3 tgtPos;
     const int mouseAreaColliderLayer = 6;
 
     // Start is called before the first frame update
     void Start()
     {
-        Cursor.visible = false; 
+        //Cursor.visible = false; 
         rb = GetComponent<Rigidbody>();
         tgtPos = transform.position;
     }
@@ -28,7 +30,9 @@ public class PlayerMallet : MonoBehaviour
 
     private void FixedUpdate() {
         UpdateTgtPos();
-        rb.MovePosition(transform.position + malletSpeed * Time.deltaTime * (tgtPos - transform.position));
+
+        var vecToTgtPos = tgtPos - transform.position;
+        rb.MovePosition(transform.position + GameController.Instance.MalletPlayerMaxSpeed * Time.deltaTime * vecToTgtPos);
     }
 
     void UpdateTgtPos() {
