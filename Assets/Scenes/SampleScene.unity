@@ -2819,7 +2819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddb53c473cc7c7048a0469060c7d9d6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debug: 1
+  debugVisualizePath: 0
   puckRadius: 0.15
   futureDistance: 10
   debugDotsParent: {fileID: 251759355}
@@ -3461,8 +3461,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e1f074c77c51a54fa59523ed3e5fa50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bobMag: 0.2
-  bobSpeed: 0.2
+  bobMag: 0.1
+  bobSpeed: 1
   bobOffset: 0
 --- !u!1 &958791804
 GameObject:
@@ -5105,6 +5105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   malletArea: {fileID: 304550590}
   puck: {fileID: 610174521}
+  player: {fileID: 1544624261}
 --- !u!1 &1408088072
 GameObject:
   m_ObjectHideFlags: 0
@@ -5533,7 +5534,6 @@ MonoBehaviour:
   malletPlayerMaxSpeed: 40
   malletAIMaxSpeed: 4
   malletAIMinSpeed: 0.5
-  malletAIStrikeDistance: 0.5
   malletAIPuckProjectionDist: 2
   puck: {fileID: 610174521}
   p1PuckSpawnPos: {fileID: 1053736322}

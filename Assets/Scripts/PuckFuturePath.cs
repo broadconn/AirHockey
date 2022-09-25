@@ -20,7 +20,7 @@ namespace Assets {
         public bool WillEnterGoal { get => willEnterGoal; }
         bool willEnterGoal = false;
 
-        List<Vector3> pathPoints = new();
+        readonly List<Vector3> pathPoints = new(); // TODO: include time to reach each point, to help the AI know where to intercept-----------------------------------------------------------------
 
 
         private void Start() {

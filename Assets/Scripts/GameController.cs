@@ -26,12 +26,6 @@ public class GameController : MonoBehaviour {
     [SerializeField] float malletAIMinSpeed = 0.5f;
     public float MalletAIMinSpeed { get => malletAIMinSpeed; }
 
-    [SerializeField] float malletAIStrikeDistance = 2;
-    public float MalletAIStrikeDistance { get => malletAIStrikeDistance; }
-
-    [SerializeField] float malletAIPuckProjectionDist = 0.5f;
-    public float MalletAIPuckProjectionDist { get => malletAIPuckProjectionDist; }
-
 
     [Header("References")]
     [SerializeField] Puck puck;
