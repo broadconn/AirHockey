@@ -2723,7 +2723,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugVisualizePath: 1
   puckRadius: 0.15
-  futureDistance: 15
+  futureBounces: 5
   debugDotsParent: {fileID: 251759355}
 --- !u!1 &653044748
 GameObject:
@@ -5586,7 +5586,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!135 &1395316372
 SphereCollider:
   m_ObjectHideFlags: 0

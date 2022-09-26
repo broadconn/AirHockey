@@ -12,7 +12,8 @@ namespace Assets {
 
         [SerializeField] bool debugVisualizePath = true;
         [SerializeField] float puckRadius = 0.3f;
-        [SerializeField] float futureDistance = 10;
+        [SerializeField] int futureBounces = 5;
+        int futureBouncesLeft = 0;
 
         [SerializeField] Transform debugDotsParent; 
 
@@ -40,15 +41,15 @@ namespace Assets {
         // if we hit a wall, start a new spherecast where it hits the wall.  
         void DoFutureCast() {
             willEnterGoal = false;
-            var futureProjectionRemaining = futureDistance;
             var castPos = rb.position;
             var castDir = rb.velocity.normalized;
             var totalPathTime = 0f;
+            futureBouncesLeft = futureBounces;
 
             futurePath.Add((rb.position, 0));
 
-            while (futureProjectionRemaining > 0) {
-                if (Physics.SphereCast(castPos, puckRadius, castDir, out RaycastHit hit, futureProjectionRemaining, layerMask)) {
+            while (futureBouncesLeft > 0) {
+                if (Physics.SphereCast(castPos, puckRadius, castDir, out RaycastHit hit, 100, layerMask)) {
                     var bounceCenter = castPos + (castDir.normalized * hit.distance); // hit.distance is the distance the sphere travelled before it collided                    
                     var lastPathPoint = futurePath[^1].point;
                     var distBetweenPoints = Vector3.Distance(bounceCenter, lastPathPoint);
@@ -65,22 +66,11 @@ namespace Assets {
 
                     castPos = bounceCenter;
                     castDir = Vector3.Reflect(castDir, hit.normal);
-
-                    futureProjectionRemaining -= hit.distance;
                 }
                 else {
-                    // add a point for the end of the projected distance
-                    var bounceCenter = castPos + (castDir.normalized * futureProjectionRemaining); // hit.distance is the distance the sphere travelled before it collided                    
-                    var lastPathPoint = futurePath[^1].point;
-                    var distBetweenPoints = Vector3.Distance(bounceCenter, lastPathPoint);
-                    var timeToReachPoint = distBetweenPoints / rb.velocity.magnitude; // assume velocity doesn't change
-                    totalPathTime += timeToReachPoint;
-                    var futurePoint = (bounceCenter, totalPathTime);
-
-                    futurePath.Add(futurePoint);
-
                     break;
                 }
+                futureBouncesLeft--;
             }
 
             // populate individual direction paths
