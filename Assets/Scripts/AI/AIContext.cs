@@ -7,6 +7,7 @@ namespace Assets.Scripts.AI {
     internal class AIContext {
         public AIMallet AiMallet { get; }
         public Puck Puck { get; }
+        public PuckFuturePath PuckFuturePath { get; }
         public PlayerMallet Player { get; }
         public float Time { get; set; }
         public float TimeInState { get; set; }
@@ -19,9 +20,10 @@ namespace Assets.Scripts.AI {
         public float PuckDirectionAngle { get => puckDirectionAngle; }
         float puckDirectionAngle = 0;
 
-        public AIContext(AIMallet aiMallet, Puck puck, PlayerMallet player) {
+        public AIContext(AIMallet aiMallet, Puck puck, PuckFuturePath puckFuture, PlayerMallet player) {
             AiMallet = aiMallet;
             Puck = puck;
+            PuckFuturePath = puckFuture;
             Player = player;
         }
 

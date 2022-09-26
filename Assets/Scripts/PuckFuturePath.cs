@@ -1,21 +1,19 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using Unity.Burst.CompilerServices;
-using Unity.VisualScripting;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Assets {
     internal class PuckFuturePath: MonoBehaviour {
         Rigidbody rb;
 
-        [SerializeField] bool debugVisualizePath = true;
         [SerializeField] float puckRadius = 0.3f;
         [SerializeField] int futureBounces = 5;
         int futureBouncesLeft = 0;
 
-        [SerializeField] Transform debugDotsParent; 
+        [Header("Debug")]
+        [SerializeField] bool debugVisualizePath = true;
+        [SerializeField] Transform debugClosestPoint;
+        [SerializeField] Transform debugDotsParent;
+        [SerializeField] Transform aiMallet; 
 
         public bool WillEnterGoal { get => willEnterGoal; }
         bool willEnterGoal = false;
@@ -32,9 +30,12 @@ namespace Assets {
             futurePath.Clear();
 
             if (rb.velocity.magnitude > 0) 
-                DoFutureCast(); 
+                DoFutureCast();
 
-            if (debugVisualizePath) DrawFuturePathLines();
+            if (debugVisualizePath) {
+                DrawFuturePathLines();
+                ShowClosestPoint();
+            }
         }
 
         // fire a spherecast out from the puck, the size of the puck, only against the wall colliders and the goal.
@@ -72,51 +73,75 @@ namespace Assets {
                 }
                 futureBouncesLeft--;
             }
-
-            // populate individual direction paths
-            foreach(var future in futurePath) {
-
-            }
         }
 
-        //public Vector3 GetClosestPoint(Vector3 samplePoint) {
-        //    if (futurePath.Count == 0) {
-        //        print("FUTURE IS EMPTY, I CANNOT");
-        //        return Vector3.zero;
-        //    }
+        void ShowClosestPoint() {
+            var closestPt = GetClosestPoint(aiMallet.position);
+            debugClosestPoint.position = closestPt;
+        }
+         
+        public Vector3 GetClosestPoint(Vector3 samplePoint) {
+            if (futurePath.Count == 0) {
+                return new Vector3(0, -1000, -1000);
+            }
 
-        //    // iterate over all the futurePoints, finding the closest point to the AI
-        //    var closestIdx = 0;
-        //    var closestDist = Mathf.Infinity;
-        //    for (int i = 0; i < futurePath.Count; i++) {
-        //        var future = futurePath[i];
-        //        var dist = Vector3.Distance(samplePoint, future.point);
-        //        if (dist < closestDist) {
-        //            closestIdx = i;
-        //            closestDist = dist;
-        //        }
-        //    }
+            // iterate over all the future points, finding the closest point to the AI
+            var closestDist = Mathf.Infinity;
+            var futureSegments = new List<(Vector3 pointA, Vector3 pointB, bool headingTowardsRedZone)>();
+            for (int i = 0; i < futurePath.Count; i++) {
+                var future = futurePath[i];
+                var dist = Vector3.Distance(samplePoint, future.point);
+                if (dist < closestDist)  
+                    closestDist = dist; 
 
-        //    // get the <=2 segments around that point
-        //    var segments = new List<(Vector3, Vector3)>();
-        //    // if the index is 0 we also have to take into account the line from the player to the 
-        //    if (closestIdx == 0) {
-        //        segments.Add(new(futurePath[closestIdx].point, futurePath[closestIdx - 1].point));
-        //    }
-        //    else {
-        //        if (closestIdx > 0)
-        //            segments.Add(new(futurePath[closestIdx].point, futurePath[closestIdx - 1].point));
-        //        if (closestIdx < futurePath.Count - 1)
-        //            segments.Add(new(futurePath[closestIdx].point, futurePath[closestIdx + 1].point));
-        //    }
+                if (i > 0) {
+                    var prevPoint = futurePath[i - 1].point;
+                    var diff = future.point - prevPoint;
+                    var towardsRedZone = diff.z > 0;
+                    futureSegments.Add((prevPoint, future.point, towardsRedZone));
+                }
+            }
 
+            // TODO: MAYBE SPLIT THIS UP TO CHECK THE FIRST BATCH OF POINTS THAT ENTER THE ENEMY AREA
+            //  THEN EVALUATE IF THE AI CAN INTERCEPT THAT CLOSEST POINT,
+            //  IF NOT THEN CHECK THE SECOND BATCH+ (IF THERE IS ONE) OF SEGMENTS THAT ENTER THE ENEMY AREA
 
-        //    // search the segments for the closest in-between location to the AI
+            // search the segments for the closest in-between location to the AI
+            var closestDist2 = Mathf.Infinity;
+            var closestPos = Vector3.zero;
+            foreach(var s in futureSegments) {
+                if (!s.headingTowardsRedZone) continue;
+                var pos = GetClosestPointOnLineAB(s.pointA, s.pointB, samplePoint);
+                var dist = Vector3.Distance(samplePoint, pos);
+                if (dist < closestDist2) {
+                    closestDist2 = dist;
+                    closestPos = pos;
+                }
+            }
 
+            // return the closest point.
+            return closestPos;
+        }
 
-        //    // return the closest point.
+        private Vector3 GetClosestPointOnLineAB(Vector3 a, Vector3 b, Vector3 point) {
+            Vector3 a_to_p = point - a;        
+            Vector3 a_to_b = b - a;      
 
-        //}
+            float lineSqLength = Vector3.SqrMagnitude(a_to_b);
+            float dotABAP = Vector3.Dot(a_to_p, a_to_b); 
+            float distance = dotABAP / lineSqLength;
+            var pointOnLine = 
+                distance < 0 ? a : 
+                distance > 1 ? b : 
+                a + a_to_b * distance;
+
+            return pointOnLine;
+        }
+
+        public Vector3? GetClosestInterceptablePoint(Vector3 aiPosition, Vector3 aiMaxVelocity) {
+            // TODO
+            return null;
+        }
 
         void DrawFuturePathLines() {
             // reset dots + line

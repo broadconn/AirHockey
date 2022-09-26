@@ -1,3 +1,4 @@
+using Assets;
 using Assets.Scripts.AI;
 using System.Collections.Generic;
 using TMPro;
@@ -7,6 +8,7 @@ public class AIMallet : MonoBehaviour
 {
     [SerializeField] MeshFilter malletArea;
     [SerializeField] Puck puck;
+    [SerializeField] PuckFuturePath puckFuturePath;
     [SerializeField] PlayerMallet player;
 
     [Header("Debug")]
@@ -27,7 +29,7 @@ public class AIMallet : MonoBehaviour
     private void Awake() {
         rb = GetComponent<Rigidbody>();
 
-        context = new AIContext(this, puck, player);
+        context = new AIContext(this, puck, puckFuturePath, player);
         stateToProcessor = new() {
             { AIMalletState.Paused, new PausedState(context) },
             { AIMalletState.Striking, new StrikingState(context) },

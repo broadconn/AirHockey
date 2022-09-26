@@ -24,7 +24,16 @@ namespace Assets.Scripts.AI {
             return AIMalletState.Intercepting;
         }
 
-        public override Vector3 UpdatePosition() { 
+        public override Vector3 UpdatePosition() {
+
+            // old dumb logic. Just try to go to behind the puck.
+            //var malletBehindPosDist = 2f;
+            //var puckPosition = ctx.Puck.Rb.position;
+            //var puckVelocity = ctx.Puck.Rb.velocity;
+            //var futurePuckPos = puckPosition + puckVelocity.normalized * malletBehindPosDist;
+            //return futurePuckPos;
+
+            // NEW SMORT LOGIC
             // if we're already on the interception path with the puck
             //      do nothing, or move along the interception path towards the puck
             // else
@@ -36,12 +45,11 @@ namespace Assets.Scripts.AI {
             //      else
             //          avoid the puck. (in the future we can try to catch the puck as it bounces back?)
 
-            // dumb logic. Just try to go to behind the puck.
-            var malletBehindPosDist = 2f;
-            var puckPosition = ctx.Puck.Rb.position;
-            var puckVelocity = ctx.Puck.Rb.velocity;
-            var futurePuckPos = puckPosition + puckVelocity.normalized * malletBehindPosDist;
-            return futurePuckPos;
+
+            // TESTING STUFF
+            // move to interception point
+            var aiPos = ctx.AiMallet.Rb.position;
+            return ctx.PuckFuturePath.GetClosestPoint(aiPos);
         }
     }
 }
