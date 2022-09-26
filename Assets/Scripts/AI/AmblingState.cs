@@ -22,22 +22,6 @@ namespace Assets.Scripts.AI {
             ambleSeedY = Random.Range(0, 1000);
         }
 
-        public override Vector3 UpdatePosition() {
-            return ctx.AiMallet.Rb.position;
-
-            if (ctx.Time > timeNextAmbleUpdate) {
-                var ambleAmount = Random.Range(0f, maxAmbleRange);
-                amble = new Vector3(Mathf.PerlinNoise(ambleSeedX, ctx.Time) - 0.5f, 0, Mathf.PerlinNoise(ctx.Time, ambleSeedY) - 0.5f).normalized * ambleAmount;
-                timeNextAmbleUpdate = ctx.Time + Random.Range(minAmbleUpdateS, maxAmbleUpdateS);
-            }
-
-            if (ctx.ChangedStateThisUpdate) {
-                ambleCenter = ctx.AiMallet.Rb.position;
-            }
-
-            return ambleCenter + amble;
-        }
-
         public override AIMalletState UpdateState() {
             // TODO: change this to more accurately predict when the ai should start "being serious"
 
@@ -47,6 +31,20 @@ namespace Assets.Scripts.AI {
                 return AIMalletState.Intercepting;
 
             return AIMalletState.Ambling;
+        }
+
+        public override Vector3 UpdatePosition() {
+            if (ctx.Time > timeNextAmbleUpdate) {
+                var ambleAmount = Random.Range(0f, maxAmbleRange);
+                amble = new Vector3(Mathf.PerlinNoise(ambleSeedX, ctx.Time) - 0.5f, 0, Mathf.PerlinNoise(ctx.Time, ambleSeedY) - 0.5f).normalized * ambleAmount;
+                timeNextAmbleUpdate = ctx.Time + Random.Range(minAmbleUpdateS, maxAmbleUpdateS);
+            }
+
+            if (ctx.StateChangedThisUpdate) {
+                ambleCenter = ctx.AiMallet.Rb.position;
+            }
+
+            return ambleCenter + amble;
         }
     }
 }

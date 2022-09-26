@@ -4,7 +4,10 @@ public class Puck : MonoBehaviour {
     [SerializeField] TrailRenderer trail;
 
     public Rigidbody Rb { get => rb; }
-    Rigidbody rb; 
+    Rigidbody rb;
+
+    Vector3 lastCollisionPos; 
+    float timeLastHitWall = 0;
      
     void Awake()
     {
@@ -13,7 +16,7 @@ public class Puck : MonoBehaviour {
 
     // Update is called once per frame
     void Update()
-    { 
+    {
     }
 
     private void FixedUpdate() { 
@@ -31,7 +34,24 @@ public class Puck : MonoBehaviour {
         }
     }
 
-    public void ResetToPosition(Vector3 pos) {
+    private void OnCollisionEnter(Collision collision) {
+        // sanity check dist / velocity = time
+        if (collision.transform.CompareTag("Player")) {
+            timeLastHitWall = Time.time;
+            lastCollisionPos = rb.position;
+        }
+        if (collision.transform.CompareTag("Wall")) {
+            var actualTime = Time.time - timeLastHitWall;
+            var distSince = Vector3.Distance(lastCollisionPos, rb.position);
+            timeLastHitWall = Time.time;
+            lastCollisionPos = rb.position;
+            var calcTime = distSince / rb.velocity.magnitude;
+            var diff = calcTime - actualTime;
+            //print($"bump: Vel:{rb.velocity.magnitude:F3} Dist:{distSince:F3} ActualTime:{actualTime:F3} CalculatedTime:{calcTime:F3} Diff:{diff:F3}");
+        }
+    }
+
+    public void ResetForNewRound(Vector3 pos) {
         transform.position = pos;
         trail.Clear();
         ZeroVelocity();

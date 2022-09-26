@@ -3,29 +3,30 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerMallet : MonoBehaviour
-{
+public class PlayerMallet : MonoBehaviour {
     [SerializeField] new Camera camera;
     [SerializeField] MeshFilter malletArea;
 
-    public Rigidbody Rb { get => rb; } 
+    public Rigidbody Rb { get => rb; }
     Rigidbody rb;
 
     Vector3 tgtPos;
     const int mouseAreaColliderLayer = 6;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         //Cursor.visible = false; 
         rb = GetComponent<Rigidbody>();
         tgtPos = transform.position;
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        
+    void Update() {
+
+    }
+     
+    public void ResetForNewRound() {
+        // ideally put the player mallet back to a starting point...
     }
 
     private void FixedUpdate() {

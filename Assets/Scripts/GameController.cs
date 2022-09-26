@@ -29,6 +29,8 @@ public class GameController : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] Puck puck;
+    [SerializeField] PlayerMallet player;
+    [SerializeField] AIMallet aiMallet;
     [SerializeField] Transform p1PuckSpawnPos;
     [SerializeField] Transform p2PuckSpawnPos;
     [SerializeField] ScoreText p1ScoreText;
@@ -57,18 +59,20 @@ public class GameController : MonoBehaviour {
     void PrepareForNewGame() {
         P1Score = 0;
         P2Score = 0;
-        SpawnPuck(1);
+        ResetForNewRound();
     }
 
     public void PlayerScored(int playerNum) {
         P1Score += playerNum == 1 ? 1 : 0;
         P2Score += playerNum == 2 ? 1 : 0;
         UpdateScoreText();
-        SpawnPuck(1);
-    }
+        ResetForNewRound();
+    } 
 
-    void SpawnPuck(int playerNum) {
-        puck.ResetToPosition(playerNum == 1 ? p1PuckSpawnPos.position : p2PuckSpawnPos.position);
+    void ResetForNewRound() {
+        puck.ResetForNewRound(p1PuckSpawnPos.position);
+        player.ResetForNewRound();
+        aiMallet.ResetForNewRound();
     }
 
     void UpdateScoreText() {
