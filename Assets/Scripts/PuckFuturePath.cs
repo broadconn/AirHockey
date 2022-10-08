@@ -7,18 +7,21 @@ namespace Assets {
 
         [SerializeField] float puckRadius = 0.3f;
         [SerializeField] int futureBounces = 5;
-        int futureBouncesLeft = 0;
+        int numBouncesLeft = 0;
 
         [Header("Debug")]
-        [SerializeField] bool debugVisualizePath = true;
         [SerializeField] Transform debugClosestPoint;
+        [SerializeField] Transform debugChosenPoint;
         [SerializeField] Transform debugDotsParent;
-        [SerializeField] Transform aiMallet; 
+        [SerializeField] AIMallet aiMallet; 
 
         public bool WillEnterGoal { get => willEnterGoal; }
         bool willEnterGoal = false;
 
-        readonly List<(Vector3 point, float timeToReach)> futurePath = new();
+        public Vector3? FarWallImpactPoint;
+
+        readonly List<((Vector3 point, float timeToReach) pointA, (Vector3 point, float timeToReach) pointB)> futureSegments = new(); //lol
+
         int layerMask;
 
         private void Start() {
@@ -27,100 +30,123 @@ namespace Assets {
         }
 
         private void Update() { 
-            futurePath.Clear();
+            DoFutureCast();
 
-            if (rb.velocity.magnitude > 0) 
-                DoFutureCast();
-
-            if (debugVisualizePath) {
+            if (GameController.Instance.Debug) {
                 DrawFuturePathLines();
                 ShowClosestPoint();
+                ShowChosenPoint();
             }
         }
 
         // fire a spherecast out from the puck, the size of the puck, only against the wall colliders and the goal.
         // if we hit a wall, start a new spherecast where it hits the wall.  
-        void DoFutureCast() {
+        void DoFutureCast() { 
+            futureSegments.Clear(); 
+            if (rb.velocity.magnitude <= 0) return;
+
+            // reset values
             willEnterGoal = false;
             var castPos = rb.position;
             var castDir = rb.velocity.normalized;
             var totalPathTime = 0f;
-            futureBouncesLeft = futureBounces;
+            FarWallImpactPoint = null;
 
-            futurePath.Add((rb.position, 0));
-
-            while (futureBouncesLeft > 0) {
-                if (Physics.SphereCast(castPos, puckRadius, castDir, out RaycastHit hit, 100, layerMask)) {
+            var prevPoint = (rb.position, 0f); 
+            numBouncesLeft = futureBounces;
+            while (numBouncesLeft > 0) {
+                if (Physics.SphereCast(castPos, puckRadius, castDir, out RaycastHit hit, Mathf.Infinity, layerMask)) {
                     var bounceCenter = castPos + (castDir.normalized * hit.distance); // hit.distance is the distance the sphere travelled before it collided                    
-                    var lastPathPoint = futurePath[^1].point;
-                    var distBetweenPoints = Vector3.Distance(bounceCenter, lastPathPoint);
+                    
+                    // path traversal time 
+                    var distBetweenPoints = Vector3.Distance(bounceCenter, prevPoint.position);
                     var timeToReachPoint = distBetweenPoints / rb.velocity.magnitude; // assume velocity doesn't change
                     totalPathTime += timeToReachPoint;
-                    var futurePoint = (bounceCenter, totalPathTime);
 
-                    futurePath.Add(futurePoint);
+                    // path bounce point
+                    var futurePoint = (bounceCenter, totalPathTime); 
+                    futureSegments.Add((prevPoint, futurePoint));
+                    prevPoint = futurePoint;
 
+                    // stop if we enter the goal
                     if (hit.transform.CompareTag("Goal")) {
                         willEnterGoal = true;
                         break;
                     }
 
+                    // set values for next raycast
                     castPos = bounceCenter;
-                    castDir = Vector3.Reflect(castDir, hit.normal);
+                    var newCastDir = Vector3.Reflect(castDir, hit.normal);
+
+                    //check for far wall impact
+                    if (FarWallImpactPoint is null) 
+                        if(Mathf.Sign(castDir.z) != Mathf.Sign(newCastDir.z)) 
+                            FarWallImpactPoint = bounceCenter; 
+
+                    castDir = newCastDir;
                 }
-                else {
-                    break;
-                }
-                futureBouncesLeft--;
-            }
+                numBouncesLeft--;
+            } 
         }
 
         void ShowClosestPoint() {
-            var closestPt = GetClosestPoint(aiMallet.position);
-            debugClosestPoint.position = closestPt;
+            var closestPt = GetClosestPointOnPath(aiMallet.transform.position);
+            debugClosestPoint.position = closestPt.point;
+        }
+
+        void ShowChosenPoint() {
+            var chosenPoint = aiMallet.GetDestination();
+            debugChosenPoint.position = chosenPoint + new Vector3(0, 0.05f, 0);
         }
          
-        public Vector3 GetClosestPoint(Vector3 samplePoint) {
-            if (futurePath.Count == 0) {
-                return new Vector3(0, -1000, -1000);
-            }
+        public (Vector3 point, float timePuckReachesHere) GetClosestPointOnPath(Vector3 samplePoint) {
+            if (futureSegments.Count == 0)  
+                return (Vector3.zero, 0);  
 
-            // iterate over all the future points, finding the closest point to the AI
-            var closestDist = Mathf.Infinity;
-            var futureSegments = new List<(Vector3 pointA, Vector3 pointB, bool headingTowardsRedZone)>();
-            for (int i = 0; i < futurePath.Count; i++) {
-                var future = futurePath[i];
-                var dist = Vector3.Distance(samplePoint, future.point);
-                if (dist < closestDist)  
-                    closestDist = dist; 
-
-                if (i > 0) {
-                    var prevPoint = futurePath[i - 1].point;
-                    var diff = future.point - prevPoint;
-                    var towardsRedZone = diff.z > 0;
-                    futureSegments.Add((prevPoint, future.point, towardsRedZone));
-                }
-            }
-
-            // TODO: MAYBE SPLIT THIS UP TO CHECK THE FIRST BATCH OF POINTS THAT ENTER THE ENEMY AREA
-            //  THEN EVALUATE IF THE AI CAN INTERCEPT THAT CLOSEST POINT,
-            //  IF NOT THEN CHECK THE SECOND BATCH+ (IF THERE IS ONE) OF SEGMENTS THAT ENTER THE ENEMY AREA
-
-            // search the segments for the closest in-between location to the AI
+            // search the segments for the closest in-between location to the sample point
             var closestDist2 = Mathf.Infinity;
-            var closestPos = Vector3.zero;
-            foreach(var s in futureSegments) {
-                if (!s.headingTowardsRedZone) continue;
-                var pos = GetClosestPointOnLineAB(s.pointA, s.pointB, samplePoint);
+            var closestPos = Vector3.zero; 
+            var closestSegment = futureSegments[0];
+            bool lastSegIsTowardsRedZone = false;
+            foreach (var seg in futureSegments) {
+                var segmentDirection = seg.pointB.point - seg.pointA.point;
+
+                // if we have finished going through a red-zone-heading section of segments, stop looking. 
+                // this is a side effect / optimisation :D
+                var thisSegIsTowardsRedZone = segmentDirection.z > 0;
+                if (lastSegIsTowardsRedZone && !thisSegIsTowardsRedZone)
+                    break;
+
+                lastSegIsTowardsRedZone = thisSegIsTowardsRedZone;
+
+                var pos = GetClosestPointOnLineAB(seg.pointA.point, seg.pointB.point, samplePoint);
                 var dist = Vector3.Distance(samplePoint, pos);
                 if (dist < closestDist2) {
                     closestDist2 = dist;
                     closestPos = pos;
+                    closestSegment = seg;
                 }
             }
 
+            // for the time, get the position as a percentage between the segment points and lerp between the segment point times
+            var percTime = InverseLerp(closestSegment.pointA.point, closestSegment.pointB.point, closestPos);
+            var time = Mathf.Lerp(closestSegment.pointA.timeToReach, closestSegment.pointB.timeToReach, percTime);
+
             // return the closest point.
-            return closestPos;
+            return (closestPos, time);
+        }
+
+        /// <summary>
+        /// The percentage that point p is between a and b
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static float InverseLerp(Vector3 a, Vector3 b, Vector3 p) {
+            Vector3 AB = b - a;
+            Vector3 AP = p - a;
+            return Vector3.Dot(AP, AB) / Vector3.Dot(AB, AB);
         }
 
         private Vector3 GetClosestPointOnLineAB(Vector3 a, Vector3 b, Vector3 point) {
@@ -138,11 +164,6 @@ namespace Assets {
             return pointOnLine;
         }
 
-        public Vector3? GetClosestInterceptablePoint(Vector3 aiPosition, Vector3 aiMaxVelocity) {
-            // TODO
-            return null;
-        }
-
         void DrawFuturePathLines() {
             // reset dots + line
             for (int i = 0; i < debugDotsParent.childCount; i++) {
@@ -151,16 +172,16 @@ namespace Assets {
             } 
 
             // draw dots along the path points + lines
-            for(int i = 0; i < futurePath.Count; i++) {
+            for(int i = 0; i < futureSegments.Count; i++) {
                 var debugPointIdx = i * 2;
                 if (debugPointIdx < debugDotsParent.childCount) {
                     var debugDot = debugDotsParent.GetChild(debugPointIdx);
-                    var pathPoint = futurePath[i].point;
+                    var pathPoint = futureSegments[i].pointB.point;
                     debugDot.transform.position = pathPoint;
 
-                    var prevPoint = i == 0 ? rb.position : futurePath[i - 1].point;
+                    var prevPoint = futureSegments[i].pointA.point;
                     var points = new Vector3[2] { pathPoint, prevPoint }; 
-                    debugDot.GetComponent<LineRenderer>().SetPositions(points);
+                    debugDot.GetComponent<LineRenderer>().SetPositions(points); // would be better to save the line renderers, but its debug so whatever
                 }
             }
         }

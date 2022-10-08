@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,6 +8,7 @@ using UnityEngine;
 public class GameController : MonoBehaviour {
     private static GameController _instance;
     public static GameController Instance { get { return _instance; } }
+    public event EventHandler<GoalScoredEventArgs> GoalScoredEvent;
 
     [Header("Puck Settings")]
     [SerializeField] float puckMaxSpeed = 20;
@@ -26,6 +28,29 @@ public class GameController : MonoBehaviour {
     [SerializeField] float malletAIMinSpeed = 0.5f;
     public float MalletAIMinSpeed { get => malletAIMinSpeed; }
 
+    [SerializeField] float malletAiStrikeSpeed = 2f; // extra speed on top of max speed
+    public float MalletAiStrikeSpeed { get => malletAiStrikeSpeed; }
+
+    [SerializeField] float malletAiStrikeForce = 5f;
+    public float MalletAiStrikeForce { get => malletAiStrikeForce; }
+
+    [SerializeField] float malletAiStrikeDistance = 0.5f;
+    public float MalletAiStrikeDistance { get => malletAiStrikeDistance; }
+
+    [SerializeField] float malletAiStrikeTime = 0.5f;
+    public float MalletAiStrikeTime { get => malletAiStrikeTime; }
+
+    [SerializeField] AnimationCurve malletAIStrikeCurve;
+    public AnimationCurve MalletAIStrikeCurve { get => malletAIStrikeCurve; }
+
+    /// <summary>
+    /// Amble range at low confidence (close to the goal) vs when confidence is high
+    /// </summary>
+    [SerializeField] Vector2 malletAIAmbleX = new(0.1f, 1f);
+    public Vector2 MalletAIAmbleX { get => malletAIAmbleX; }
+
+    [SerializeField] float malletAIAmbleY = 0.1f;
+    public float MalletAIAmbleY { get => malletAIAmbleY; }
 
     [Header("References")]
     [SerializeField] Puck puck;
@@ -36,6 +61,8 @@ public class GameController : MonoBehaviour {
     [SerializeField] ScoreText p1ScoreText;
     [SerializeField] ScoreText p2ScoreText;
 
+    [Header("Debug")]
+    public bool Debug = false;
 
     public int P1Score { get; private set; }
     public int P2Score { get; private set; }
@@ -53,7 +80,13 @@ public class GameController : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        
+        CheckForDebugChange();
+    }
+
+    void CheckForDebugChange() {
+        if (Input.GetKeyDown(KeyCode.BackQuote)) {
+            Debug = !Debug;
+        }
     }
 
     void PrepareForNewGame() {
@@ -66,7 +99,11 @@ public class GameController : MonoBehaviour {
         P1Score += playerNum == 1 ? 1 : 0;
         P2Score += playerNum == 2 ? 1 : 0;
         UpdateScoreText();
-        ResetForNewRound();
+
+        var e = new GoalScoredEventArgs(playerNum);
+        GoalScoredEvent?.Invoke(this, e);
+
+        ResetForNewRound(); // consider doing this once the player has clicked a ui button
     } 
 
     void ResetForNewRound() {
@@ -78,5 +115,13 @@ public class GameController : MonoBehaviour {
     void UpdateScoreText() {
         p1ScoreText.UpdateScore(P1Score);
         p2ScoreText.UpdateScore(P2Score);
+    }
+}
+
+public class GoalScoredEventArgs : EventArgs {
+    public int PlayerNum { get; set; }
+
+    public GoalScoredEventArgs(int playerNum) {
+        PlayerNum = playerNum;  
     }
 }
