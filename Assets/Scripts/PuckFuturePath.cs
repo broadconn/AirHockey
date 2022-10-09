@@ -18,7 +18,7 @@ namespace Assets {
         public bool WillEnterGoal { get => willEnterGoal; }
         bool willEnterGoal = false;
 
-        public Vector3? FarWallImpactPoint;
+        public Vector3? RedWallImpactPoint;
 
         readonly List<((Vector3 point, float timeToReach) pointA, (Vector3 point, float timeToReach) pointB)> futureSegments = new(); //lol
 
@@ -30,7 +30,7 @@ namespace Assets {
         }
 
         private void Update() { 
-            DoFutureCast();
+            DoFutureCastAgainstRed();
 
             if (GameController.Instance.Debug) {
                 DrawFuturePathLines();
@@ -41,16 +41,16 @@ namespace Assets {
 
         // fire a spherecast out from the puck, the size of the puck, only against the wall colliders and the goal.
         // if we hit a wall, start a new spherecast where it hits the wall.  
-        void DoFutureCast() { 
-            futureSegments.Clear(); 
-            if (rb.velocity.magnitude <= 0) return;
-
+        void DoFutureCastAgainstRed() {
             // reset values
+            futureSegments.Clear();
             willEnterGoal = false;
             var castPos = rb.position;
             var castDir = rb.velocity.normalized;
             var totalPathTime = 0f;
-            FarWallImpactPoint = null;
+            RedWallImpactPoint = null;
+
+            if (rb.velocity.magnitude <= 0) return; // puck not moving
 
             var prevPoint = (rb.position, 0f); 
             numBouncesLeft = futureBounces;
@@ -78,10 +78,11 @@ namespace Assets {
                     castPos = bounceCenter;
                     var newCastDir = Vector3.Reflect(castDir, hit.normal);
 
-                    //check for far wall impact
-                    if (FarWallImpactPoint is null) 
-                        if(Mathf.Sign(castDir.z) != Mathf.Sign(newCastDir.z)) 
-                            FarWallImpactPoint = bounceCenter; 
+                    //check for red wall impact
+                    if (RedWallImpactPoint is null)
+                        if (Mathf.Sign(castDir.z) > Mathf.Sign(newCastDir.z)) {
+                            RedWallImpactPoint = bounceCenter;
+                        }
 
                     castDir = newCastDir;
                 }

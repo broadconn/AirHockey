@@ -25,23 +25,21 @@ public class GameController : MonoBehaviour {
     [SerializeField] float malletAIMaxSpeed = 10;
     public float MalletAIMaxSpeed { get => malletAIMaxSpeed; }
 
-    [SerializeField] float malletAIMinSpeed = 0.5f;
-    public float MalletAIMinSpeed { get => malletAIMinSpeed; }
-
-    [SerializeField] float malletAiStrikeSpeed = 2f; // extra speed on top of max speed
-    public float MalletAiStrikeSpeed { get => malletAiStrikeSpeed; }
-
-    [SerializeField] float malletAiStrikeForce = 5f;
-    public float MalletAiStrikeForce { get => malletAiStrikeForce; }
+    [SerializeField] float malletAiMaxSpeedToStillChasePuck = 4f;
+    public float MalletAiMaxSpeedToStillChasePuck { get => malletAiMaxSpeedToStillChasePuck; }
 
     [SerializeField] float malletAiStrikeDistance = 0.5f;
     public float MalletAiStrikeDistance { get => malletAiStrikeDistance; }
+
+    [SerializeField] float malletAiStrikeForce = 5f;
+    public float MalletAiStrikeForce { get => malletAiStrikeForce; }
 
     [SerializeField] float malletAiStrikeTime = 0.5f;
     public float MalletAiStrikeTime { get => malletAiStrikeTime; }
 
     [SerializeField] AnimationCurve malletAIStrikeCurve;
     public AnimationCurve MalletAIStrikeCurve { get => malletAIStrikeCurve; }
+
 
     /// <summary>
     /// Amble range at low confidence (close to the goal) vs when confidence is high
@@ -50,7 +48,7 @@ public class GameController : MonoBehaviour {
     public Vector2 MalletAIAmbleX { get => malletAIAmbleX; }
 
     [SerializeField] float malletAIAmbleY = 0.1f;
-    public float MalletAIAmbleY { get => malletAIAmbleY; }
+    public float MalletAIAmbleY { get => malletAIAmbleY; } 
 
     [Header("References")]
     [SerializeField] Puck puck;

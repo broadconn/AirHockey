@@ -1,6 +1,4 @@
-﻿using Mono.Cecil;
-using System.Xml.Serialization;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.AI {
     /// <summary>
@@ -8,56 +6,38 @@ namespace Assets.Scripts.AI {
     /// Do what real people do, hover randomly near the goal, or closer to the centerline if the player is closer to their goal.
     /// </summary>
     internal class AmblingState : AIState {   
-        // random ambling settings
-        Vector3 amble;
-        float timeNextAmbleUpdate = 0;
-        float ambleSeedX, ambleSeedY;
-        const float minAmbleUpdateS = 0.1f, maxAmbleUpdateS = 3f;
-        const float maxAmbleRange = 1f;
-        Vector3 ambleCenter;
+        Vector3 amble; 
+        Vector3 ambleCenter; // the target center point
+        Vector3 curCenter; // smoothed center point
 
-        public AmblingState(AIContext context) : base(context) {
-            ambleSeedX = Random.Range(0, 1000);
-            ambleSeedY = Random.Range(0, 1000);
+        public AmblingState(AIContext context) : base(context) { 
+        }
+
+        public override void OnEnterState() {
+            curCenter = ctx.AiMallet.Rb.position;
         }
 
         public override AIMalletState UpdateState() {
-            // if the puck is heading towards us, change to interception mode.
-            var lowestVelToStllChasePuck = 4f;
+            // if the puck is heading towards us, change to interception mode. 
             var puckIsMoving = ctx.Puck.Rb.velocity.magnitude > 0;
-            var puckHeadingTowardsMe = ctx.Puck.Rb.velocity.z > 0;
-            var puckMovingAwayTooSlow = false;// ctx.Puck.Rb.velocity.z < 0 && ctx.Puck.Rb.velocity.z > -lowestVelToStllChasePuck; 
-            if (puckIsMoving && (puckHeadingTowardsMe || puckMovingAwayTooSlow))
+            if (puckIsMoving && (ctx.PuckMovingTowardsUs || (ctx.PuckOnOurSide && ctx.PuckMovingAwayTooSlow)))
                 return AIMalletState.Intercepting;
 
             return AIMalletState.Ambling;
         }
 
         public override Vector3 UpdatePosition() {
-            amble = UpdateSmoothAmble();
-
+            amble = UpdateAmbleDiff();
             ambleCenter = GetAmbleCenter();
+            curCenter = ambleCenter;// Vector3.Lerp(curCenter, ambleCenter, Time.deltaTime * speedReachCenterPoint);
 
-            return ambleCenter + amble;
+            return curCenter + amble;
         }
 
-        float ConfidenceToAmbleRange() {
-            return -1;
-        }
-
-        Vector3 UpdateRandomAmble(Vector3 curAmble) { 
-            if (ctx.Time > timeNextAmbleUpdate) {
-                var ambleAmount = Random.Range(0f, maxAmbleRange);
-                curAmble = new Vector3(Mathf.PerlinNoise(ambleSeedX, ctx.Time) - 0.5f, 0, Mathf.PerlinNoise(ctx.Time, ambleSeedY) - 0.5f).normalized * ambleAmount;
-                timeNextAmbleUpdate = ctx.Time + Random.Range(minAmbleUpdateS, maxAmbleUpdateS); 
-            }
-            return curAmble;
-        }
-
-        Vector3 UpdateSmoothAmble() {
+        Vector3 UpdateAmbleDiff() {
             var t = Time.time;
             var oscillateTime = 0.5f;
-            var xWid = Mathf.Lerp(GameController.Instance.MalletAIAmbleX.x, GameController.Instance.MalletAIAmbleX.y, ctx.Confidence.Value);
+            var xWid = Mathf.Lerp(GameController.Instance.MalletAIAmbleX.x, GameController.Instance.MalletAIAmbleX.y, ctx.Riskyness.Value);
             var yWid = GameController.Instance.MalletAIAmbleY;
             var x = Mathf.Sin(t / oscillateTime ) * xWid;
             var y = Mathf.Sin(t / oscillateTime * 2) * yWid;
@@ -72,7 +52,7 @@ namespace Assets.Scripts.AI {
             var offset = 0.5f;
             var unconfidentEnd = ctx.AIGoalPos + (ctx.ArenaCenterPos - ctx.AIGoalPos).normalized * offset;
             var confidentEnd = ctx.ArenaCenterPos + (ctx.AIGoalPos - ctx.ArenaCenterPos).normalized * offset;
-            var ambleLocation = Vector3.Lerp(unconfidentEnd, confidentEnd, ctx.Confidence.Value);
+            var ambleLocation = Vector3.Lerp(unconfidentEnd, confidentEnd, ctx.Riskyness.Value);
 
             // dont go ahead of the puck, it's weird bro 
             if (ctx.Puck.Rb.position.z > ambleLocation.z) {

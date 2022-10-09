@@ -55,27 +55,30 @@ public class AIMallet : MonoBehaviour {
         HandleDebug();
 
         UpdateContext();
+
         UpdateState();
         UpdatePosition();
     }
 
     void HandleDebug() {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) { context.Confidence.DebugForceValue(0.1f); }
-        if (Input.GetKeyDown(KeyCode.Alpha2)) { context.Confidence.DebugForceValue(0.2f); }
-        if (Input.GetKeyDown(KeyCode.Alpha3)) { context.Confidence.DebugForceValue(0.3f); }
-        if (Input.GetKeyDown(KeyCode.Alpha4)) { context.Confidence.DebugForceValue(0.4f); }
-        if (Input.GetKeyDown(KeyCode.Alpha5)) { context.Confidence.DebugForceValue(0.5f); }
-        if (Input.GetKeyDown(KeyCode.Alpha6)) { context.Confidence.DebugForceValue(0.6f); }
-        if (Input.GetKeyDown(KeyCode.Alpha7)) { context.Confidence.DebugForceValue(0.7f); }
-        if (Input.GetKeyDown(KeyCode.Alpha8)) { context.Confidence.DebugForceValue(0.8f); }
-        if (Input.GetKeyDown(KeyCode.Alpha9)) { context.Confidence.DebugForceValue(0.9f); }
+        if (Input.GetKeyDown(KeyCode.Alpha0)) { context.Riskyness.DebugForceValue(0.0f); }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) { context.Riskyness.DebugForceValue(0.1f); }
+        if (Input.GetKeyDown(KeyCode.Alpha2)) { context.Riskyness.DebugForceValue(0.2f); }
+        if (Input.GetKeyDown(KeyCode.Alpha3)) { context.Riskyness.DebugForceValue(0.3f); }
+        if (Input.GetKeyDown(KeyCode.Alpha4)) { context.Riskyness.DebugForceValue(0.4f); }
+        if (Input.GetKeyDown(KeyCode.Alpha5)) { context.Riskyness.DebugForceValue(0.5f); }
+        if (Input.GetKeyDown(KeyCode.Alpha6)) { context.Riskyness.DebugForceValue(0.6f); }
+        if (Input.GetKeyDown(KeyCode.Alpha7)) { context.Riskyness.DebugForceValue(0.7f); }
+        if (Input.GetKeyDown(KeyCode.Alpha8)) { context.Riskyness.DebugForceValue(0.8f); }
+        if (Input.GetKeyDown(KeyCode.Alpha9)) { context.Riskyness.DebugForceValue(0.9f); }
     }
 
     void UpdateContext() {
         context.Time = Time.time;
         context.TimeInState += Time.deltaTime;
+        context.TimeInRound += Time.deltaTime;
         context.StateChangedThisUpdate = false;
-        context.UpdateCommonCalcs();
+        context.Update();
     }
 
     void UpdateState() {
@@ -85,22 +88,40 @@ public class AIMallet : MonoBehaviour {
             context.TimeInState = 0; 
         }
         curState = newState;
+         
+        if (context.StateChangedThisUpdate)
+            stateToProcessor[curState].OnEnterState();
 
         // debug
         debugStateText.text = curState.ToString();
-        debugConfidence.text = context.Confidence.Value.ToString();
+        debugConfidence.text = context.Riskyness.Value.ToString("F3");
     }
 
     void UpdatePosition() {
         var desiredPos = stateToProcessor[curState].UpdatePosition();
+        Debug.LogWarning($"Desiredpos: {desiredPos}");
+
+        // TODO let state return speed?
 
         // limit position to the mallet area mesh
-        desiredPosOnMesh = ClosestPointOnMesh(malletArea, desiredPos);
+        //desiredPosOnMesh = ClosestPointOnMesh(malletArea, desiredPos); 
+
+        const int numRefinements = 3;
+        var meshPoint = ClosestPointOnMesh(malletArea, desiredPos);
+        for (int i = 0; i < numRefinements; i++) {
+            var vecToMeshPoint = meshPoint - transform.position;
+            var distToMeshPoint = vecToMeshPoint.magnitude;
+            var desiredPosAtMeshPointDist = transform.position + (desiredPos - transform.position).normalized * distToMeshPoint;
+            meshPoint = ClosestPointOnMesh(malletArea, desiredPosAtMeshPointDist);
+        }
+        desiredPosOnMesh = meshPoint;
     }
 
     public void OnGoalScored(object e, GoalScoredEventArgs playerScored) {
+        context.TimeInRound = 0;
+
         context.PlayerScoredLast = playerScored.PlayerNum == 1;
-        context.Confidence.OnGoalScored(context.PlayerScoredLast);
+        context.Riskyness.OnGoalScored(context.PlayerScoredLast);
     }
 
     public void ResetForNewRound() {
@@ -116,7 +137,7 @@ public class AIMallet : MonoBehaviour {
         rb.MovePosition(transform.position + move);
     }
 
-    Vector3 ClosestPointOnMesh(MeshFilter meshFilter, Vector3 worldPoint) {
+    public static Vector3 ClosestPointOnMesh(MeshFilter meshFilter, Vector3 worldPoint) {
         var localPoint = meshFilter.transform.InverseTransformPoint(worldPoint); 
         var localClosest = meshFilter.sharedMesh.bounds.ClosestPoint(localPoint);
         return meshFilter.transform.TransformPoint(localClosest); 

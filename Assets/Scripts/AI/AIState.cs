@@ -7,7 +7,8 @@ namespace Assets.Scripts.AI {
 
         public AIState(AIContext context) {
             ctx = context;
-        } 
+        }
+        public abstract void OnEnterState();
         public abstract AIMalletState UpdateState();
         public abstract Vector3 UpdatePosition();
     }  

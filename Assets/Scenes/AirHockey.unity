@@ -915,7 +915,7 @@ Transform:
   m_GameObject: {fileID: 304550587}
   m_LocalRotation: {x: 0.70710707, y: -0, z: -0, w: 0.70710653}
   m_LocalPosition: {x: 0, y: -0, z: 5.13}
-  m_LocalScale: {x: 9.340282, y: 9.429593, z: 8.871007}
+  m_LocalScale: {x: 10.643252, y: 9.429593, z: 8.871007}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1770147629}
@@ -6065,26 +6065,25 @@ MonoBehaviour:
   puckMinSpeed: 2
   malletPlayerMaxSpeed: 40
   malletAIMaxSpeed: 4
-  malletAIMinSpeed: 0.5
-  malletAiStrikeSpeed: 2
-  malletAiStrikeForce: 5
+  malletAiMaxSpeedToStillChasePuck: 2.5
   malletAiStrikeDistance: 1
-  malletAiStrikeTime: 0.5
+  malletAiStrikeForce: 5
+  malletAiStrikeTime: 0.2
   malletAIStrikeCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 6.533019
-      outSlope: 6.533019
+      inSlope: 46.495
+      outSlope: 46.495
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.088730454
+      outWeight: 0.06968428
     - serializedVersion: 3
-      time: 0.09332288
-      value: 0.99532646
+      time: 0.051806632
+      value: 1.0001231
       inSlope: -0.048214138
       outSlope: -0.048214138
       tangentMode: 0
@@ -6092,14 +6091,23 @@ MonoBehaviour:
       inWeight: 0.47649035
       outWeight: 0.06504679
     - serializedVersion: 3
-      time: 0.36418885
-      value: 0.45754912
+      time: 0.35335854
+      value: 0.60668993
       inSlope: -2.9371548
       outSlope: -2.9371548
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.06602739
+    - serializedVersion: 3
+      time: 0.6199529
+      value: 0.12596966
+      inSlope: -0.841118
+      outSlope: -0.841118
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.17067823
     - serializedVersion: 3
       time: 1
       value: 0
@@ -13302,7 +13310,7 @@ GameObject:
   - component: {fileID: 2018530023}
   m_Layer: 0
   m_Name: Goal Trigger
-  m_TagString: Goal
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -13442,7 +13450,7 @@ Transform:
   m_GameObject: {fileID: 2028605753}
   m_LocalRotation: {x: 0.70710707, y: -0, z: -0, w: 0.70710653}
   m_LocalPosition: {x: 0, y: 0, z: -5.21}
-  m_LocalScale: {x: 9.340282, y: 9.429593, z: 8.871007}
+  m_LocalScale: {x: 10.643252, y: 9.429593, z: 8.871007}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1770147629}
