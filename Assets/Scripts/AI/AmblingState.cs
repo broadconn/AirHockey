@@ -20,7 +20,7 @@ namespace Assets.Scripts.AI {
         public override AIMalletState UpdateState() {
             // if the puck is heading towards us, change to interception mode. 
             var puckIsMoving = ctx.Puck.Rb.velocity.magnitude > 0;
-            if (puckIsMoving && (ctx.PuckMovingTowardsUs || (ctx.PuckOnOurSide && ctx.PuckMovingAwayTooSlow)))
+            if (puckIsMoving && (ctx.PuckMovingTowardsAI || (ctx.PuckOnOurSide && ctx.PuckMovingAwayTooSlow)))
                 return AIMalletState.Intercepting;
 
             return AIMalletState.Ambling;

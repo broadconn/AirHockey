@@ -19,7 +19,7 @@ namespace Assets.Scripts.AI {
             if (ctx.AIBehindPuck && ctx.WithinStrikingDistance)
                 return AIMalletState.Striking;
                
-            var shouldIntercept = ctx.PuckMovingTowardsUs || (ctx.PuckOnOurSide && ctx.PuckMovingAwayTooSlow); 
+            var shouldIntercept = ctx.PuckMovingTowardsAI || (ctx.PuckOnOurSide && ctx.PuckMovingAwayTooSlow); 
             if (shouldIntercept)
                 return AIMalletState.Intercepting;
 

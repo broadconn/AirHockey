@@ -23,7 +23,7 @@ namespace Assets.Scripts.AI {
 
         // helper properties
         public float AiDistFromPuck { get => Vector3.Distance(AiMallet.Rb.position, Puck.Rb.position); }
-        public bool PuckMovingTowardsUs { get => Puck.Rb.velocity.z > 0; }
+        public bool PuckMovingTowardsAI { get => Puck.Rb.velocity.z > 0; }
         public bool PuckMovingAway { get => Puck.Rb.velocity.z < 0; }
         public bool PuckMovingAwayTooSlow { get => Puck.Rb.velocity.z > -GameController.Instance.MalletAiMaxSpeedToStillChasePuck; }
         public bool PuckOnOurSide { get => Puck.Rb.position.z > ArenaCenterPos.z; }

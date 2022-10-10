@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ScoreText : MonoBehaviour
 { 
     [SerializeField] AnimationCurve scaleCurve;
 
-    TextMeshProUGUI scoreText;
+    Text scoreText;
     float timeScored = -999;
     float scaleAnimLength = 1;
     float curScore = 0;
@@ -15,7 +13,7 @@ public class ScoreText : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        scoreText = GetComponent<TextMeshProUGUI>();
+        scoreText = GetComponent<Text>();
     }
 
     // Update is called once per frame

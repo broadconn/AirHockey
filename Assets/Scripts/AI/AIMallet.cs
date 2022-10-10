@@ -1,8 +1,8 @@
 using Assets;
 using Assets.Scripts.AI;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AIMallet : MonoBehaviour {
     [Header("AI Context")]
@@ -14,8 +14,8 @@ public class AIMallet : MonoBehaviour {
     [SerializeField] Transform myGoal;
 
     [Header("Debug")]
-    [SerializeField] TextMeshProUGUI debugStateText;
-    [SerializeField] TextMeshProUGUI debugConfidence;
+    [SerializeField] Text debugStateText;
+    [SerializeField] Text debugConfidence;
 
     AIContext context;
 
@@ -99,22 +99,8 @@ public class AIMallet : MonoBehaviour {
 
     void UpdatePosition() {
         var desiredPos = stateToProcessor[curState].UpdatePosition();
-        Debug.LogWarning($"Desiredpos: {desiredPos}");
-
-        // TODO let state return speed?
-
-        // limit position to the mallet area mesh
-        //desiredPosOnMesh = ClosestPointOnMesh(malletArea, desiredPos); 
-
-        const int numRefinements = 3;
-        var meshPoint = ClosestPointOnMesh(malletArea, desiredPos);
-        for (int i = 0; i < numRefinements; i++) {
-            var vecToMeshPoint = meshPoint - transform.position;
-            var distToMeshPoint = vecToMeshPoint.magnitude;
-            var desiredPosAtMeshPointDist = transform.position + (desiredPos - transform.position).normalized * distToMeshPoint;
-            meshPoint = ClosestPointOnMesh(malletArea, desiredPosAtMeshPointDist);
-        }
-        desiredPosOnMesh = meshPoint;
+        var malletPos = transform.position;
+        desiredPosOnMesh = GetPointOnMeshAlongLineToPoint(malletArea, malletPos, desiredPos);
     }
 
     public void OnGoalScored(object e, GoalScoredEventArgs playerScored) {
@@ -135,6 +121,29 @@ public class AIMallet : MonoBehaviour {
         if (move.magnitude > vectorToDesiredPos.magnitude)
             move = vectorToDesiredPos;
         rb.MovePosition(transform.position + move);
+    }
+
+    /// <summary>
+    /// Limits the position to the given mesh, along the line between the mallet and the world position. 
+    /// See the test scene to highlight why refinements are required, but because the mesh is square, the closest point on the mesh won't be on the line between the mallet and the point,
+    /// unless the world point is very close to the edge of the mesh. So if we sample again along the desired line at a distance that the first sample reached, it should be pretty close to the edge.
+    /// Do this more times to get more accurate.
+    /// </summary>
+    /// <param name="meshFilter"></param>
+    /// <param name="malletPos"></param>
+    /// <param name="worldPoint"></param>
+    /// <param name="numRefinements"></param>
+    /// <returns></returns>
+    public static Vector3 GetPointOnMeshAlongLineToPoint(MeshFilter meshFilter, Vector3 malletPos, Vector3 worldPoint, int numRefinements = 3) {
+        var meshPoint = ClosestPointOnMesh(meshFilter, worldPoint);
+        for (int i = 0; i < numRefinements; i++) {
+            var malletToMeshPointVector = meshPoint - malletPos;
+            var distToMeshPoint = malletToMeshPointVector.magnitude;
+            var malletToWorldPointVector = worldPoint - malletPos;
+            var closerSamplePoint = malletPos + malletToWorldPointVector.normalized * distToMeshPoint;
+            meshPoint = ClosestPointOnMesh(meshFilter, closerSamplePoint);
+        }
+        return meshPoint;
     }
 
     public static Vector3 ClosestPointOnMesh(MeshFilter meshFilter, Vector3 worldPoint) {

@@ -1,6 +1,4 @@
-﻿using System;
-using Unity.VisualScripting.FullSerializer;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.AI {
     /// <summary>
@@ -23,12 +21,11 @@ namespace Assets.Scripts.AI {
             var shouldStrike = 
                 ctx.WithinStrikingDistance
                 && ctx.AIBehindPuck
-                && (ctx.PuckMovingTowardsUs || ctx.PuckMovingAwayTooSlow);
+                && (ctx.PuckMovingTowardsAI || ctx.PuckMovingAwayTooSlow);
 
             if(shouldStrike)
                 return AIMalletState.Striking;
 
-            // otherwise amble.
             return AIMalletState.Ambling;
         }
 
@@ -43,7 +40,6 @@ namespace Assets.Scripts.AI {
             // execute the strike
             var percThroughStrike = TimeSinceLastStrike() / GameController.Instance.MalletAiStrikeTime;
             var animPercBetweenPoints = GameController.Instance.MalletAIStrikeCurve.Evaluate(percThroughStrike); 
-            Debug.LogWarning($"Anim: {percThroughStrike:F3} {animPercBetweenPoints:F3}");
             return Vector3.Lerp(strikeReturnPos, strikeTgtPos, animPercBetweenPoints);
         }
 
@@ -52,9 +48,15 @@ namespace Assets.Scripts.AI {
             var puckPosition = ctx.Puck.Rb.position;
             var puckVelocity = ctx.Puck.Rb.velocity;
             var malletPos = ctx.AiMallet.Rb.position;
-            strikeTgtPos = puckPosition - puckVelocity.normalized * GameController.Instance.MalletAiStrikeForce;
+            strikeTgtPos = puckPosition - puckVelocity.normalized * GameController.Instance.MalletAiStrikeForce; // this doesn't work well if the mallet isn't in the interception path already.
+
+            // TODO: improve the strike location if the mallet isn't on the interception path yet
+            //var puckFutureProject = 0.1f; // try to get where the puck will be when we hit it
+            //var futurePuckPos = puckPosition + puckVelocity.normalized * puckFutureProject; 
+            //strikeTgtPos = futurePuckPos + (futurePuckPos - malletPos).normalized * GameController.Instance.MalletAiStrikeForce;
+
             strikeReturnPos = malletPos;
-            Debug.LogWarning($"Strike: {strikeTgtPos} {strikeReturnPos}");
+            Debug.Log($"Strike: {puckPosition} {strikeTgtPos} {strikeReturnPos}");
         }
 
         bool OnStrikeCooldown() {
