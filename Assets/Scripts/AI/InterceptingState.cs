@@ -6,6 +6,7 @@ namespace Assets.Scripts.AI {
     /// </summary>
     internal class InterceptingState : AIState {
         Vector3 inaccuracyOffset;
+        public bool DebugLogs = false;
 
         public InterceptingState(AIContext context) : base(context) {
 
@@ -31,9 +32,9 @@ namespace Assets.Scripts.AI {
         public override Vector3 UpdatePosition() {
             var aiPos = ctx.AiMallet.Rb.position;
 
-            // if we should give the puck a nudge but we're in front of the puck, we need to get behind it.
+            // if the puck is moving away too slow and we should it a nudge but we're in front of the puck, we need to get behind it.
             if (ctx.PuckMovingAwayTooSlow && !ctx.AIBehindPuck) {
-                Debug.Log($"MOVING BEHIND THE PUCK");
+                if(DebugLogs) Debug.Log($"MOVING BEHIND THE PUCK");
                 return ctx.AIGoalPos; // dumb logic, lets hope it works most of the time 
             }
 
@@ -46,7 +47,8 @@ namespace Assets.Scripts.AI {
 
                 var (closestPathInterceptionPoint, timeBeforePuckReaches) = ctx.PuckFuturePath.GetClosestPointOnPath(samplePos);
                 if (CanReachPointOnPath(closestPathInterceptionPoint, timeBeforePuckReaches)) {
-                    Debug.Log($"GOING TO INTERCEPTION POINT {i}");
+                    if (DebugLogs) Debug.Log($"GOING TO INTERCEPTION POINT {i}");
+                    ctx.LastInterceptionTgtPoint = closestPathInterceptionPoint;
                     return closestPathInterceptionPoint + inaccuracyOffset;
                 }
             }
@@ -55,12 +57,12 @@ namespace Assets.Scripts.AI {
 
             // if it's going into the goal, head straight to the goal point ( pretend it cares )
             if (ctx.PuckFuturePath.WillEnterGoal) {
-                Debug.Log("ITS GOING IN THE GOAL, I CANNOT REACH AHHH");
+                if (DebugLogs) Debug.Log("ITS GOING IN THE GOAL, I CANNOT REACH AHHH");
                 return ctx.AIGoalPos;
             }
 
             // else (can't intercept, not heading towards goal) head towards the impact point on our wall
-            Debug.Log($"Cant intercept. Going home / wall. {ctx.Puck.Rb.velocity.z}");
+            if (DebugLogs) Debug.Log($"Cant intercept. Going home / wall. {ctx.Puck.Rb.velocity.z}");
             return ctx.PuckFuturePath.RedWallImpactPoint ?? aiPos;
         } 
 
@@ -70,7 +72,7 @@ namespace Assets.Scripts.AI {
             var curPos = ctx.AiMallet.Rb.position;
             var distanceToTravel = Vector3.Distance(point, curPos);
             var speed = GameController.Instance.MalletAIMaxSpeed;
-            return distanceToTravel / speed <= timeLeft * 2;
+            return distanceToTravel / speed <= timeLeft;
         }
 
         void SetInaccuracy() { 

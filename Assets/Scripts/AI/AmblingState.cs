@@ -10,11 +10,15 @@ namespace Assets.Scripts.AI {
         Vector3 ambleCenter; // the target center point
         Vector3 curCenter; // smoothed center point
 
+        const float timeReachAmbleCenter = 3;
+        float timeEnteredState = 0;
+
         public AmblingState(AIContext context) : base(context) { 
         }
 
         public override void OnEnterState() {
             curCenter = ctx.AiMallet.Rb.position;
+            timeEnteredState = ctx.Time;
         }
 
         public override AIMalletState UpdateState() {
@@ -27,14 +31,15 @@ namespace Assets.Scripts.AI {
         }
 
         public override Vector3 UpdatePosition() {
-            amble = UpdateAmbleDiff();
+            amble = UpdateAmble();
             ambleCenter = GetAmbleCenter();
-            curCenter = ambleCenter;// Vector3.Lerp(curCenter, ambleCenter, Time.deltaTime * speedReachCenterPoint);
+            var perc = Mathf.Clamp01((ctx.Time - timeEnteredState) / timeReachAmbleCenter);
+            curCenter = ambleCenter;// Vector3.Lerp(curCenter, ambleCenter, perc);
 
             return curCenter + amble;
         }
 
-        Vector3 UpdateAmbleDiff() {
+        Vector3 UpdateAmble() {
             var t = Time.time;
             var oscillateTime = 0.5f;
             var xWid = Mathf.Lerp(GameController.Instance.MalletAIAmbleX.x, GameController.Instance.MalletAIAmbleX.y, ctx.Riskyness.Value);
@@ -45,21 +50,17 @@ namespace Assets.Scripts.AI {
         }
 
         Vector3 GetAmbleCenter() {
-            // if the player scored last, position self close to the middle of the board. make it harder for the player. 
-            // else maybe do the same but slower. Or just meander around where u hit the puck
-            // confidence controls how far towards the red/blue centerline or goal we be feelin 
-
-            var offset = 0.5f;
+            var offset = 0.5f; // distance out from the goal / centerline to amble
             var unconfidentEnd = ctx.AIGoalPos + (ctx.ArenaCenterPos - ctx.AIGoalPos).normalized * offset;
             var confidentEnd = ctx.ArenaCenterPos + (ctx.AIGoalPos - ctx.ArenaCenterPos).normalized * offset;
             var ambleLocation = Vector3.Lerp(unconfidentEnd, confidentEnd, ctx.Riskyness.Value);
 
-            // dont go ahead of the puck, it's weird bro 
-            if (ctx.Puck.Rb.position.z > ambleLocation.z) {
+            // this might be better as a different state (position behind puck)
+            if (ambleLocation.z < ctx.Puck.Rb.position.z) {
                 ambleLocation = new Vector3(ambleLocation.x, ambleLocation.y, ctx.Puck.Rb.position.z + ctx.AiMallet.Radius);
             }
 
-            return ambleLocation;// ctx.AiMallet.Rb.position;
+            return ambleLocation;
         }
     }
 }

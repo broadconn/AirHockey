@@ -20,6 +20,7 @@ namespace Assets.Scripts.AI {
         public float TimeLastStruckPuck { get; set; } = -999;
         public bool PlayerScoredLast { get; set; } = false;
         public Riskyness Riskyness { get; set; }
+        public Vector3 LastInterceptionTgtPoint { get; set; }
 
         // helper properties
         public float AiDistFromPuck { get => Vector3.Distance(AiMallet.Rb.position, Puck.Rb.position); }
@@ -61,7 +62,8 @@ internal class Riskyness {
 
     // grows from 0 every round
     float impatience = 0;
-    const float impatienceSpeed = 0.01f; // how quickly impatience grows during a round
+    const float impatienceSpeed = 0.02f; // how quickly impatience grows during a round
+    const float maxImpatience = 0.6f; 
 
     // riskyness determines how far away from the goal it passively hangs around.
     // things that affect riskyness:
@@ -74,7 +76,7 @@ internal class Riskyness {
     internal Riskyness(AIContext ctx) { this.ctx = ctx; }
 
     public void Update() {
-        impatience = ctx.TimeInRound * impatienceSpeed;
+        impatience = Mathf.Clamp(ctx.TimeInRound * impatienceSpeed, 0, maxImpatience);
     }
 
     public void OnGoalScored(bool playerScored) {

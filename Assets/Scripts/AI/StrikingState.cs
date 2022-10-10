@@ -48,21 +48,26 @@ namespace Assets.Scripts.AI {
             var puckPosition = ctx.Puck.Rb.position;
             var puckVelocity = ctx.Puck.Rb.velocity;
             var malletPos = ctx.AiMallet.Rb.position;
-            strikeTgtPos = puckPosition - puckVelocity.normalized * GameController.Instance.MalletAiStrikeForce; // this doesn't work well if the mallet isn't in the interception path already.
+            //strikeTgtPos = puckPosition - puckVelocity.normalized * GameController.Instance.MalletAiStrikeForce; // this doesn't work well if the mallet isn't in the interception path already.
 
             // TODO: improve the strike location if the mallet isn't on the interception path yet
-            //var puckFutureProject = 0.1f; // try to get where the puck will be when we hit it
-            //var futurePuckPos = puckPosition + puckVelocity.normalized * puckFutureProject; 
+            //var puckFutureProject = 0;// 0.1f; // try to get where the puck will be when we hit it
+            //var futurePuckPos = puckPosition + puckVelocity.normalized * puckFutureProject;
             //strikeTgtPos = futurePuckPos + (futurePuckPos - malletPos).normalized * GameController.Instance.MalletAiStrikeForce;
 
+            // strike direction = halfway between the interception point and the puck? puck should be p close to the intercept point
+            var closestPathPos = ctx.PuckFuturePath.GetClosestPointOnPath(malletPos).point;
+            var strikeTgt = Vector3.Lerp(closestPathPos, puckPosition, 0.1f);
+            strikeTgtPos = strikeTgt + (strikeTgt - malletPos).normalized * GameController.Instance.MalletAiStrikeForce;
+
             strikeReturnPos = malletPos;
-            Debug.Log($"Strike: {puckPosition} {strikeTgtPos} {strikeReturnPos}");
+            Debug.Log($"Strike: {ctx.LastInterceptionTgtPoint} {puckPosition} {strikeTgtPos} {strikeReturnPos}");
         }
 
         bool OnStrikeCooldown() {
             return TimeSinceLastStrike() < GameController.Instance.MalletAiStrikeTime;
         }
-
+         
         float TimeSinceLastStrike() {
             return ctx.Time - ctx.TimeLastStruckPuck;
         }

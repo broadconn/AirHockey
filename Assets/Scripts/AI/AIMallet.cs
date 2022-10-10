@@ -57,7 +57,7 @@ public class AIMallet : MonoBehaviour {
         UpdateContext();
 
         UpdateState();
-        UpdatePosition();
+        UpdateTgtPosition();
     }
 
     void HandleDebug() {
@@ -97,7 +97,7 @@ public class AIMallet : MonoBehaviour {
         debugConfidence.text = context.Riskyness.Value.ToString("F3");
     }
 
-    void UpdatePosition() {
+    void UpdateTgtPosition() {
         var desiredPos = stateToProcessor[curState].UpdatePosition();
         var malletPos = transform.position;
         desiredPosOnMesh = GetPointOnMeshAlongLineToPoint(malletArea, malletPos, desiredPos);
@@ -115,12 +115,16 @@ public class AIMallet : MonoBehaviour {
     }
 
     private void FixedUpdate() {
+        DoMove();
+    }
+
+    void DoMove() { 
         var vectorToDesiredPos = desiredPosOnMesh - transform.position;
         var moveSpeed = GameController.Instance.MalletAIMaxSpeed;
-        var move = moveSpeed * Time.deltaTime * vectorToDesiredPos.normalized;
-        if (move.magnitude > vectorToDesiredPos.magnitude)
-            move = vectorToDesiredPos;
-        rb.MovePosition(transform.position + move);
+        var frameMovement = moveSpeed * Time.deltaTime * vectorToDesiredPos.normalized;
+        if (frameMovement.magnitude > vectorToDesiredPos.magnitude)
+            frameMovement = vectorToDesiredPos;
+        rb.MovePosition(transform.position + frameMovement);
     }
 
     /// <summary>
