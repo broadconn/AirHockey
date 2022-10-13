@@ -1,22 +1,34 @@
+using Mono.Cecil;
 using UnityEngine;
 
 public class Puck : MonoBehaviour {
     [SerializeField] TrailRenderer trail;
+    [SerializeField] Transform player;
+    [SerializeField] Transform ai;
+    [SerializeField] Transform playerPuckSpawnPos;
+    [SerializeField] Transform aiPuckSpawnPos;
+    public Vector3 AiPuckSpawnPos { get => aiPuckSpawnPos.position; }
+
 
     public Rigidbody Rb { get => rb; }
+
     Rigidbody rb;
 
+    new SphereCollider collider;
     Vector3 lastCollisionPos; 
     float timeLastHitWall = 0;
+    float playerServing = 0;
      
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        collider = GetComponent<SphereCollider>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        //collider.enabled = rb.velocity.magnitude > 0 || PlayerServingInZPosBehindPuck();
     }
 
     private void FixedUpdate() { 
@@ -31,6 +43,17 @@ public class Puck : MonoBehaviour {
             && rb.velocity.magnitude < GameController.Instance.PuckMinSpeed) {
             var s = rb.velocity.normalized * GameController.Instance.PuckMinSpeed;
             rb.velocity = s;
+        }
+    }
+
+    bool PlayerServingInZPosBehindPuck() {
+        if (playerServing == 1) {
+            var safeZ = playerPuckSpawnPos.position.z;
+            return player.position.z < safeZ;
+        }
+        else {
+            var safeZ = aiPuckSpawnPos.position.z;
+            return ai.position.z > safeZ;
         }
     }
 
@@ -51,8 +74,9 @@ public class Puck : MonoBehaviour {
         }
     }
 
-    public void ResetForNewRound(Vector3 pos) {
-        transform.position = pos;
+    public void ResetForNewRound(bool playerServing) {
+        transform.position = playerServing ? playerPuckSpawnPos.position : aiPuckSpawnPos.position;
+        //collider.enabled = false;
         trail.Clear();
         ZeroVelocity();
     }

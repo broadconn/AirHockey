@@ -12,6 +12,7 @@ namespace Assets.Scripts.AI {
         public PlayerMallet Player { get; }
         public Vector3 ArenaCenterPos { get; }
         public Vector3 AIGoalPos { get; }
+        public Vector3 AIServeStartPos { get; }
         public float Time { get; set; }
         public float TimeInState { get; set; }
         public float TimeInRound { get; set; }
@@ -39,6 +40,7 @@ namespace Assets.Scripts.AI {
             ArenaCenterPos = arenaCenterPos;
             AIGoalPos = aiGoalPos;
             Riskyness = new(this);
+            AIServeStartPos = AiMallet.ServePos;
         }
 
         public void Update() {

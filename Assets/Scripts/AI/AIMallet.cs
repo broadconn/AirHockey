@@ -12,6 +12,8 @@ public class AIMallet : MonoBehaviour {
     [SerializeField] PlayerMallet player;
     [SerializeField] Transform arenaCenter;
     [SerializeField] Transform myGoal;
+    [SerializeField] Transform aiPuckServePos;
+    public Vector3 ServePos { get => aiPuckServePos.position; }
 
     [Header("Debug")]
     [SerializeField] Text debugStateText;
@@ -41,10 +43,9 @@ public class AIMallet : MonoBehaviour {
             { AIMalletState.Paused, new PausedState(context) },
             { AIMalletState.Striking, new StrikingState(context) },
             { AIMalletState.Intercepting, new InterceptingState(context) },
-            { AIMalletState.Ambling, new AmblingState(context) }
+            { AIMalletState.Ambling, new AmblingState(context) },
+            { AIMalletState.Serving, new ServingState(context) }
         };
-
-        curState = AIMalletState.Ambling;
     }
 
     private void Start() {
@@ -52,15 +53,19 @@ public class AIMallet : MonoBehaviour {
     }
 
     private void Update() {
-        HandleDebug();
-
         UpdateContext();
-
         UpdateState();
-        UpdateTgtPosition();
+
+        ConstrainDesiredPosToMesh();
+
+        if (GameController.Instance.Debug)
+            DebugStuff();
     }
 
-    void HandleDebug() {
+    void DebugStuff() {
+        debugStateText.text = curState.ToString();
+        debugConfidence.text = context.Riskyness.Value.ToString("F3");
+
         if (Input.GetKeyDown(KeyCode.Alpha0)) { context.Riskyness.DebugForceValue(0.0f); }
         if (Input.GetKeyDown(KeyCode.Alpha1)) { context.Riskyness.DebugForceValue(0.1f); }
         if (Input.GetKeyDown(KeyCode.Alpha2)) { context.Riskyness.DebugForceValue(0.2f); }
@@ -91,13 +96,9 @@ public class AIMallet : MonoBehaviour {
          
         if (context.StateChangedThisUpdate)
             stateToProcessor[curState].OnEnterState();
-
-        // debug
-        debugStateText.text = curState.ToString();
-        debugConfidence.text = context.Riskyness.Value.ToString("F3");
     }
 
-    void UpdateTgtPosition() {
+    void ConstrainDesiredPosToMesh() {
         var desiredPos = stateToProcessor[curState].UpdatePosition();
         var malletPos = transform.position;
         desiredPosOnMesh = GetPointOnMeshAlongLineToPoint(malletArea, malletPos, desiredPos);
@@ -110,8 +111,12 @@ public class AIMallet : MonoBehaviour {
         context.Riskyness.OnGoalScored(context.PlayerScoredLast);
     }
 
-    public void ResetForNewRound() {
-        curState = AIMalletState.Ambling;        
+    public void ResetForNewRound(bool isServing) {
+        if (isServing) {
+            print("MALLET SERVE U BITCH");
+            curState = AIMalletState.Serving;
+            stateToProcessor[curState].OnEnterState();
+        }
     }
 
     private void FixedUpdate() {
@@ -165,5 +170,6 @@ public enum AIMalletState {
     Paused,
     Ambling,
     Intercepting,
-    Striking
+    Striking,
+    Serving
 }

@@ -1487,6 +1487,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 368186282}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &374848766
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 374848767}
+  m_Layer: 0
+  m_Name: AIServePos
+  m_TagString: Untagged
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &374848767
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374848766}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 3.48}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 415782465}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &389471580
 GameObject:
   m_ObjectHideFlags: 0
@@ -1817,6 +1848,7 @@ Transform:
   - {fileID: 1053736322}
   - {fileID: 1698099102}
   - {fileID: 1933126509}
+  - {fileID: 374848767}
   m_Father: {fileID: 1634334147}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2737,6 +2769,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trail: {fileID: 488032986}
+  player: {fileID: 1544624260}
+  ai: {fileID: 1395316377}
+  playerPuckSpawnPos: {fileID: 1053736322}
+  aiPuckSpawnPos: {fileID: 1698099102}
 --- !u!114 &610174522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2876,7 +2912,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.0047169924, b: 0.0047169924, a: 1}
+  m_Color: {r: 0.0039215684, g: 0.34377366, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5412,7 +5448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.5417106, b: 0.990566, a: 1}
+  m_Color: {r: 0.99215686, g: 0, b: 0.15279055, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5707,6 +5743,7 @@ MonoBehaviour:
   player: {fileID: 1544624261}
   arenaCenter: {fileID: 1933126509}
   myGoal: {fileID: 2103518177}
+  aiPuckServePos: {fileID: 374848767}
   debugStateText: {fileID: 1559695806}
   debugConfidence: {fileID: 2076165229}
 --- !u!1 &1408088072
@@ -6553,7 +6590,7 @@ GameObject:
   - component: {fileID: 1550225048}
   - component: {fileID: 1550225047}
   m_Layer: 5
-  m_Name: P1Canvas
+  m_Name: P1ScoreCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7329,7 +7366,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1698099101}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1.394}
+  m_LocalPosition: {x: 0.12, y: 0, z: 1.394}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13345,7 +13382,7 @@ GameObject:
   - component: {fileID: 2075522421}
   - component: {fileID: 2075522420}
   m_Layer: 5
-  m_Name: P2Canvas
+  m_Name: P2ScoreCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

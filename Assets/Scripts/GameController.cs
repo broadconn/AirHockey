@@ -36,6 +36,8 @@ public class GameController : MonoBehaviour {
     [SerializeField] AnimationCurve malletAIStrikeCurve;
     public AnimationCurve MalletAIStrikeCurve { get => malletAIStrikeCurve; }
 
+    public int LastPlayerScored { get; set; } = 1;
+
 
     /// <summary>
     /// Amble range at low confidence (close to the goal) vs when confidence is high
@@ -92,18 +94,20 @@ public class GameController : MonoBehaviour {
     public void PlayerScored(int playerNum) {
         P1Score += playerNum == 1 ? 1 : 0;
         P2Score += playerNum == 2 ? 1 : 0;
+        LastPlayerScored = playerNum;
         UpdateScoreText();
 
         var e = new GoalScoredEventArgs(playerNum);
         GoalScoredEvent?.Invoke(this, e);
 
-        ResetForNewRound(); // consider doing this once the player has clicked a ui button
+        ResetForNewRound();
     } 
 
     void ResetForNewRound() {
-        puck.ResetForNewRound(p1PuckSpawnPos.position);
+        var playerServing = LastPlayerScored != 1;
         player.ResetForNewRound();
-        aiMallet.ResetForNewRound();
+        puck.ResetForNewRound(playerServing);
+        aiMallet.ResetForNewRound(!playerServing);
     }
 
     void UpdateScoreText() {
