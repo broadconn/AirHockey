@@ -22,10 +22,6 @@ public class PlayerMallet : MonoBehaviour {
     void Update() {
 
     }
-     
-    public void ResetForNewRound() {
-        // ideally put the player mallet back to a starting point...
-    }
 
     private void FixedUpdate() {
         UpdateTgtPos();
@@ -40,14 +36,8 @@ public class PlayerMallet : MonoBehaviour {
         // try to go to the world position the mouse points to
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 1000, layerMask)) {
-            Vector3 hitWorldPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
+            var hitWorldPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
             tgtPos = Utilities.GetClosestPointOnMeshAlongLineFromPoint(malletArea, hitWorldPos, camera.transform.position);
         }
-    }
-
-    Vector3 ClosestPointOnMesh(MeshFilter meshFilter, Vector3 worldPoint) {
-        var localPoint = meshFilter.transform.InverseTransformPoint(worldPoint); 
-        var localClosest = meshFilter.sharedMesh.bounds.ClosestPoint(localPoint);
-        return meshFilter.transform.TransformPoint(localClosest); 
     }
 }

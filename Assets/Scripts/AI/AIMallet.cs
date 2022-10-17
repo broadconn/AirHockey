@@ -105,18 +105,15 @@ public class AIMallet : MonoBehaviour {
         desiredPosOnMesh = Utilities.GetClosestPointOnMeshAlongLineFromPoint(malletArea, malletPos, desiredPos);
     }
 
-    public void OnGoalScored(object e, GoalScoredEventArgs playerScored) {
+    public void OnGoalScored(object e, GoalScoredEventArgs scoringPlayerInfo) {
         context.TimeInRound = 0;
-
-        context.PlayerScoredLast = playerScored.PlayerNum == 1;
+        context.PlayerScoredLast = scoringPlayerInfo.PlayerNum == 1;
         context.Riskyness.OnGoalScored(context.PlayerScoredLast);
     }
 
-    public void ResetForNewRound(bool isServing) {
-        if (isServing) {
-            curState = AIMalletState.Serving;
-            stateToProcessor[curState].OnEnterState();
-        }
+    public void ResetForNewRound(bool isServing) { 
+        curState = isServing ? AIMalletState.Serving : AIMalletState.Ambling;
+        stateToProcessor[curState].OnEnterState(); 
     }
 
     private void FixedUpdate() {

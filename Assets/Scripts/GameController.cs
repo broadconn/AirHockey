@@ -106,7 +106,6 @@ public class GameController : MonoBehaviour {
 
     void ResetForNewRound() {
         var playerServing = LastPlayerScored != 1;
-        player.ResetForNewRound();
         puck.ResetForNewRound(playerServing);
         aiMallet.ResetForNewRound(!playerServing);
     }
