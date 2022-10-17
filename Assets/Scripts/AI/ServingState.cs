@@ -2,6 +2,7 @@
 
 namespace Assets.Scripts.AI {
     internal class ServingState : AIState {
+        bool debugLogs = false;
         bool hasGoneThroughStrikeLocation = false;
         bool hasGoneToServeStartLocation = false;
         bool hasGoneToServeStrikeLocation = false;
@@ -37,7 +38,7 @@ namespace Assets.Scripts.AI {
 
         public override AIMalletState UpdateState() {
             if (hasGoneThroughStrikeLocation) {
-                Debug.Log("hit puck, going dark");
+                if (debugLogs) Debug.Log("hit puck, going dark");
                 return AIMalletState.Ambling;
             }
 
@@ -48,7 +49,7 @@ namespace Assets.Scripts.AI {
             // go to start of serve pos
             if (!hasGoneToServeStartLocation) {
                 var distFromServePos = Vector3.Distance(ctx.AIServeStartPos, ctx.AiMallet.Rb.position);
-                Debug.Log($"going to serve start {ctx.AIServeStartPos} {ctx.AiMallet.Rb.position} {distFromServePos:F2}");
+                if(debugLogs) Debug.Log($"going to serve start {ctx.AIServeStartPos} {ctx.AiMallet.Rb.position} {distFromServePos:F2}");
                 if (distFromServePos > 0.1f)
                     return ctx.AIServeStartPos;
 
@@ -57,7 +58,7 @@ namespace Assets.Scripts.AI {
 
             // go to a point near the puck at an angle
             if (!hasGoneToServeStrikeLocation) {
-                Debug.Log($"going to pre-strike pos {servePreStrikeLocation}");
+                if (debugLogs) Debug.Log($"going to pre-strike pos {servePreStrikeLocation}");
                 var distFromStrikePos = Vector3.Distance(ctx.AiMallet.Rb.position, servePreStrikeLocation);
                 if (distFromStrikePos > 0.1f)
                     return servePreStrikeLocation;
@@ -67,7 +68,7 @@ namespace Assets.Scripts.AI {
 
             // do the hit
             if (!hasGoneThroughStrikeLocation) {
-                Debug.Log($"going to strike location {servePreStrikeLocation}");
+                if (debugLogs) Debug.Log($"going to strike location {servePreStrikeLocation}");
                 var distFromStrikePos = Vector3.Distance(ctx.AiMallet.Rb.position, serveStrikeLocation);
                 if (distFromStrikePos > 0.1f)
                     return serveStrikeLocation;

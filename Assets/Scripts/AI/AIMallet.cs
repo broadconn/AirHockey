@@ -1,5 +1,6 @@
 using Assets;
 using Assets.Scripts.AI;
+using Assets.Scripts.Utility;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,8 +25,8 @@ public class AIMallet : MonoBehaviour {
     public Rigidbody Rb { get => rb; }
     Rigidbody rb;
 
-    public float Radius { get => radius; }
-    private float radius;
+    public float Radius { get => worldRadius; }
+    private float worldRadius;
 
     Vector3 desiredPosOnMesh;
      
@@ -36,7 +37,7 @@ public class AIMallet : MonoBehaviour {
 
     private void Awake() {
         rb = GetComponent<Rigidbody>();
-        radius = GetComponent<SphereCollider>().radius * transform.localScale.z;
+        worldRadius = GetComponent<SphereCollider>().radius * transform.localScale.z;
 
         context = new AIContext(this, puck, puckFuturePath, player, arenaCenter.position, myGoal.position);
         stateToProcessor = new() {
@@ -101,7 +102,7 @@ public class AIMallet : MonoBehaviour {
     void ConstrainDesiredPosToMesh() {
         var desiredPos = stateToProcessor[curState].UpdatePosition();
         var malletPos = transform.position;
-        desiredPosOnMesh = GetPointOnMeshAlongLineToPoint(malletArea, malletPos, desiredPos);
+        desiredPosOnMesh = Utilities.GetClosestPointOnMeshAlongLineFromPoint(malletArea, malletPos, desiredPos);
     }
 
     public void OnGoalScored(object e, GoalScoredEventArgs playerScored) {
@@ -113,7 +114,6 @@ public class AIMallet : MonoBehaviour {
 
     public void ResetForNewRound(bool isServing) {
         if (isServing) {
-            print("MALLET SERVE U BITCH");
             curState = AIMalletState.Serving;
             stateToProcessor[curState].OnEnterState();
         }
@@ -130,35 +130,6 @@ public class AIMallet : MonoBehaviour {
         if (frameMovement.magnitude > vectorToDesiredPos.magnitude)
             frameMovement = vectorToDesiredPos;
         rb.MovePosition(transform.position + frameMovement);
-    }
-
-    /// <summary>
-    /// Limits the position to the given mesh, along the line between the mallet and the world position. 
-    /// See the test scene to highlight why refinements are required, but because the mesh is square, the closest point on the mesh won't be on the line between the mallet and the point,
-    /// unless the world point is very close to the edge of the mesh. So if we sample again along the desired line at a distance that the first sample reached, it should be pretty close to the edge.
-    /// Do this more times to get more accurate.
-    /// </summary>
-    /// <param name="meshFilter"></param>
-    /// <param name="malletPos"></param>
-    /// <param name="worldPoint"></param>
-    /// <param name="numRefinements"></param>
-    /// <returns></returns>
-    public static Vector3 GetPointOnMeshAlongLineToPoint(MeshFilter meshFilter, Vector3 malletPos, Vector3 worldPoint, int numRefinements = 3) {
-        var meshPoint = ClosestPointOnMesh(meshFilter, worldPoint);
-        for (int i = 0; i < numRefinements; i++) {
-            var malletToMeshPointVector = meshPoint - malletPos;
-            var distToMeshPoint = malletToMeshPointVector.magnitude;
-            var malletToWorldPointVector = worldPoint - malletPos;
-            var closerSamplePoint = malletPos + malletToWorldPointVector.normalized * distToMeshPoint;
-            meshPoint = ClosestPointOnMesh(meshFilter, closerSamplePoint);
-        }
-        return meshPoint;
-    }
-
-    public static Vector3 ClosestPointOnMesh(MeshFilter meshFilter, Vector3 worldPoint) {
-        var localPoint = meshFilter.transform.InverseTransformPoint(worldPoint); 
-        var localClosest = meshFilter.sharedMesh.bounds.ClosestPoint(localPoint);
-        return meshFilter.transform.TransformPoint(localClosest); 
     }
 
     public Vector3 GetDestination() {

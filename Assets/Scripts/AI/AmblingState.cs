@@ -5,16 +5,16 @@ namespace Assets.Scripts.AI {
     /// Puck is moving away, towards player or player hasn't hit the puck yet. 
     /// Do what real people do, hover randomly near the goal, or closer to the centerline if the player is closer to their goal.
     /// </summary>
-    internal class AmblingState : AIState {   
+    internal class AmblingState : AIState {
         Vector3 amble; 
         Vector3 ambleCenter; // the target center point
         Vector3 curCenter; // smoothed center point
 
         const float timeReachAmbleCenter = 3;
+        const float ambleOscillateTime = 0.5f;
         float timeEnteredState = 0;
 
-        public AmblingState(AIContext context) : base(context) { 
-        }
+        public AmblingState(AIContext context) : base(context) { }
 
         public override void OnEnterState() {
             curCenter = ctx.AiMallet.Rb.position;
@@ -39,13 +39,16 @@ namespace Assets.Scripts.AI {
             return curCenter + amble;
         }
 
+        /// <summary>
+        /// The swaying offset that will be applied to a center point
+        /// </summary>
+        /// <returns></returns>
         Vector3 UpdateAmble() {
             var t = Time.time;
-            var oscillateTime = 0.5f;
-            var xWid = Mathf.Lerp(GameController.Instance.MalletAIAmbleX.x, GameController.Instance.MalletAIAmbleX.y, ctx.Riskyness.Value);
-            var yWid = GameController.Instance.MalletAIAmbleY;
-            var x = Mathf.Sin(t / oscillateTime ) * xWid;
-            var y = Mathf.Sin(t / oscillateTime * 2) * yWid;
+            var xMax = Mathf.Lerp(GameController.Instance.MalletAIAmbleX.x, GameController.Instance.MalletAIAmbleX.y, ctx.Riskyness.Value);
+            var yMax = GameController.Instance.MalletAIAmbleY;
+            var x = Mathf.Sin(t / ambleOscillateTime ) * xMax;
+            var y = Mathf.Sin(t / ambleOscillateTime * 2) * yMax; // x2 to create a figure-eight pattern
             return new Vector3(x, 0, y);
         }
 

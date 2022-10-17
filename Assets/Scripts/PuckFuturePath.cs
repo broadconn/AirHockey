@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Assets.Scripts.Utility;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets {
@@ -130,24 +131,11 @@ namespace Assets {
             }
 
             // for the time, get the position as a percentage between the segment points and lerp between the segment point times
-            var percTime = InverseLerp(closestSegment.pointA.point, closestSegment.pointB.point, closestPos);
+            var percTime = Utilities.InverseLerp(closestSegment.pointA.point, closestSegment.pointB.point, closestPos);
             var time = Mathf.Lerp(closestSegment.pointA.timeToReach, closestSegment.pointB.timeToReach, percTime);
 
             // return the closest point.
             return (closestPos, time);
-        }
-
-        /// <summary>
-        /// The percentage that point p is between a and b
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public static float InverseLerp(Vector3 a, Vector3 b, Vector3 p) {
-            Vector3 AB = b - a;
-            Vector3 AP = p - a;
-            return Vector3.Dot(AP, AB) / Vector3.Dot(AB, AB);
         }
 
         private Vector3 GetClosestPointOnLineAB(Vector3 a, Vector3 b, Vector3 point) {

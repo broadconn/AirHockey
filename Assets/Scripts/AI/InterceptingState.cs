@@ -5,8 +5,8 @@ namespace Assets.Scripts.AI {
     /// Intercepting the puck, ideally to hit it back towards the player goal
     /// </summary>
     internal class InterceptingState : AIState {
+        bool debugLogs = false;
         Vector3 inaccuracyOffset;
-        public bool DebugLogs = false;
 
         public InterceptingState(AIContext context) : base(context) {
 
@@ -34,7 +34,7 @@ namespace Assets.Scripts.AI {
 
             // if the puck is moving away too slow and we should it a nudge but we're in front of the puck, we need to get behind it.
             if (ctx.PuckMovingAwayTooSlow && !ctx.AIBehindPuck) {
-                if(DebugLogs) Debug.Log($"MOVING BEHIND THE PUCK");
+                if(debugLogs) Debug.Log($"MOVING BEHIND THE PUCK");
                 return ctx.AIGoalPos; // dumb logic, lets hope it works most of the time 
             }
 
@@ -47,7 +47,7 @@ namespace Assets.Scripts.AI {
 
                 var (closestPathInterceptionPoint, timeBeforePuckReaches) = ctx.PuckFuturePath.GetClosestPointOnPath(samplePos);
                 if (CanReachPointOnPath(closestPathInterceptionPoint, timeBeforePuckReaches)) {
-                    if (DebugLogs) Debug.Log($"GOING TO INTERCEPTION POINT {i}");
+                    if (debugLogs) Debug.Log($"GOING TO INTERCEPTION POINT {i}");
                     ctx.LastInterceptionTgtPoint = closestPathInterceptionPoint;
                     return closestPathInterceptionPoint + inaccuracyOffset;
                 }
@@ -57,12 +57,12 @@ namespace Assets.Scripts.AI {
 
             // if it's going into the goal, head straight to the goal point ( pretend it cares )
             if (ctx.PuckFuturePath.WillEnterGoal) {
-                if (DebugLogs) Debug.Log("ITS GOING IN THE GOAL, I CANNOT REACH AHHH");
+                if (debugLogs) Debug.Log("ITS GOING IN THE GOAL, I CANNOT REACH AHHH");
                 return ctx.AIGoalPos;
             }
 
             // else (can't intercept, not heading towards goal) head towards the impact point on our wall
-            if (DebugLogs) Debug.Log($"Cant intercept. Going home / wall. {ctx.Puck.Rb.velocity.z}");
+            if (debugLogs) Debug.Log($"Cant intercept. Going home / wall. {ctx.Puck.Rb.velocity.z}");
             return ctx.PuckFuturePath.RedWallImpactPoint ?? aiPos;
         } 
 

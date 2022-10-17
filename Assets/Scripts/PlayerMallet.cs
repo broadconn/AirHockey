@@ -1,3 +1,4 @@
+using Assets.Scripts.Utility;
 using UnityEngine;
 
 public class PlayerMallet : MonoBehaviour {
@@ -40,7 +41,7 @@ public class PlayerMallet : MonoBehaviour {
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 1000, layerMask)) {
             Vector3 hitWorldPos = new Vector3(hit.point.x, transform.position.y, hit.point.z);
-            tgtPos = ClosestPointOnMesh(malletArea, hitWorldPos);
+            tgtPos = Utilities.GetClosestPointOnMeshAlongLineFromPoint(malletArea, hitWorldPos, camera.transform.position);
         }
     }
 

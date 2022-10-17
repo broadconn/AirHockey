@@ -36,7 +36,7 @@ public class GameController : MonoBehaviour {
     [SerializeField] AnimationCurve malletAIStrikeCurve;
     public AnimationCurve MalletAIStrikeCurve { get => malletAIStrikeCurve; }
 
-    public int LastPlayerScored { get; set; } = 1;
+    public int LastPlayerScored { get; set; }
 
 
     /// <summary>
@@ -88,6 +88,7 @@ public class GameController : MonoBehaviour {
     void PrepareForNewGame() {
         P1Score = 0;
         P2Score = 0;
+        LastPlayerScored = 2; // set to opposite of the player that should start
         ResetForNewRound();
     }
 

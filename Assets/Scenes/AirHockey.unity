@@ -1203,7 +1203,7 @@ MonoBehaviour:
   defaultLookPos: {fileID: 508346183}
   lookTarget: {fileID: 1529772962}
   lookSpeed: 1
-  deviationLimit: 20
+  deviationLimit: 100
 --- !u!1 &355409556
 GameObject:
   m_ObjectHideFlags: 0
