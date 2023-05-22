@@ -17,7 +17,7 @@ public class Puck : MonoBehaviour {
     new SphereCollider collider;
     Vector3 lastCollisionPos; 
     float timeLastHitWall = 0;
-    float playerServing = 0;
+    int playerServing = 0;
      
     void Awake()
     {
@@ -58,7 +58,6 @@ public class Puck : MonoBehaviour {
     }
 
     private void OnCollisionEnter(Collision collision) {
-        // sanity check dist / velocity = time
         if (collision.transform.CompareTag("Player")) {
             timeLastHitWall = Time.time;
             lastCollisionPos = rb.position;
@@ -74,8 +73,8 @@ public class Puck : MonoBehaviour {
         }
     }
 
-    public void ResetForNewRound(bool playerServing) {
-        transform.position = playerServing ? playerPuckSpawnPos.position : aiPuckSpawnPos.position;
+    public void ResetForNewRound(bool p) {
+        transform.position = playerServing == 1 ? playerPuckSpawnPos.position : aiPuckSpawnPos.position;
         //collider.enabled = false;
         trail.Clear();
         ZeroVelocity();

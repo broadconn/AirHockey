@@ -5,7 +5,7 @@ public class DebugChildEnabler : MonoBehaviour
     void Update()
     {
         foreach(Transform t in transform) {
-            t.gameObject.SetActive(GameController.Instance.Debug);
+            t.gameObject.SetActive(GameController.Instance.debug);
         }
     }
 }

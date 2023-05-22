@@ -12,7 +12,7 @@ namespace Assets.Scripts.AI {
         public StrikingState(AIContext context) : base(context) { }
 
         public override void OnEnterState() {
-            ctx.TimeLastStruckPuck = -999;
+            Ctx.TimeLastStruckPuck = -999;
         }
 
         public override AIMalletState UpdateState() {
@@ -20,9 +20,9 @@ namespace Assets.Scripts.AI {
             if (OnStrikeCooldown()) return AIMalletState.Striking; 
 
             var shouldStrike = 
-                ctx.WithinStrikingDistance
-                && ctx.AIBehindPuck
-                && (ctx.PuckMovingTowardsAI || ctx.PuckMovingAwayTooSlow);
+                Ctx.WithinStrikingDistance
+                && Ctx.AIBehindPuck
+                && (Ctx.PuckMovingTowardsAI || Ctx.PuckMovingAwayTooSlow);
 
             if(shouldStrike)
                 return AIMalletState.Striking;
@@ -41,10 +41,10 @@ namespace Assets.Scripts.AI {
         }
 
         void TriggerStrike() {
-            ctx.TimeLastStruckPuck = ctx.Time;
-            var puckPosition = ctx.Puck.Rb.position;
-            var puckVelocity = ctx.Puck.Rb.velocity;
-            var malletPos = ctx.AiMallet.Rb.position;
+            Ctx.TimeLastStruckPuck = Ctx.Time;
+            var puckPosition = Ctx.Puck.Rb.position;
+            var puckVelocity = Ctx.Puck.Rb.velocity;
+            var malletPos = Ctx.AiMallet.Rb.position;
 
             // TODO: be smart about the interception point.
             //      if the player is not in between the puck and the goal, aim straight for the goal (can randomize the chance of this)
@@ -59,12 +59,12 @@ namespace Assets.Scripts.AI {
 
             // strike direction = halfway between the interception point and the puck? puck should be p close to the intercept point
             // figure out the actual math based on puck speed if this isn't good enough
-            var closestPathPos = ctx.PuckFuturePath.GetClosestPointOnPath(malletPos).point;
+            var closestPathPos = Ctx.PuckFuturePath.GetClosestPointOnPath(malletPos).point;
             var strikeTgt = Vector3.Lerp(closestPathPos, puckPosition, 0.1f);
             strikeTgtPos = strikeTgt + (strikeTgt - malletPos).normalized * GameController.Instance.MalletAiStrikeForce;
 
             strikeReturnPos = malletPos;
-            if (debugLogs) Debug.Log($"Strike: {ctx.LastInterceptionTgtPoint} {puckPosition} {strikeTgtPos} {strikeReturnPos}");
+            if (debugLogs) Debug.Log($"Strike: {Ctx.LastInterceptionTgtPoint} {puckPosition} {strikeTgtPos} {strikeReturnPos}");
         }
 
         bool OnStrikeCooldown() {
@@ -72,7 +72,7 @@ namespace Assets.Scripts.AI {
         }
          
         float TimeSinceLastStrike() {
-            return ctx.Time - ctx.TimeLastStruckPuck;
+            return Ctx.Time - Ctx.TimeLastStruckPuck;
         }
     }
 }

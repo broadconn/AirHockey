@@ -17,14 +17,14 @@ namespace Assets.Scripts.AI {
         public AmblingState(AIContext context) : base(context) { }
 
         public override void OnEnterState() {
-            curCenter = ctx.AiMallet.Rb.position;
-            timeEnteredState = ctx.Time;
+            curCenter = Ctx.AiMallet.Rb.position;
+            timeEnteredState = Ctx.Time;
         }
 
         public override AIMalletState UpdateState() {
             // if the puck is heading towards us, change to interception mode. 
-            var puckIsMoving = ctx.Puck.Rb.velocity.magnitude > 0;
-            if (puckIsMoving && (ctx.PuckMovingTowardsAI || (ctx.PuckOnOurSide && ctx.PuckMovingAwayTooSlow)))
+            var puckIsMoving = Ctx.Puck.Rb.velocity.magnitude > 0;
+            if (puckIsMoving && (Ctx.PuckMovingTowardsAI || (Ctx.PuckOnOurSide && Ctx.PuckMovingAwayTooSlow)))
                 return AIMalletState.Intercepting;
 
             return AIMalletState.Ambling;
@@ -33,7 +33,7 @@ namespace Assets.Scripts.AI {
         public override Vector3 UpdatePosition() {
             amble = UpdateAmble();
             ambleCenter = GetAmbleCenter();
-            var perc = Mathf.Clamp01((ctx.Time - timeEnteredState) / timeReachAmbleCenter);
+            //var perc = Mathf.Clamp01((Ctx.Time - timeEnteredState) / timeReachAmbleCenter);
             curCenter = ambleCenter;// Vector3.Lerp(curCenter, ambleCenter, perc);
 
             return curCenter + amble;
@@ -43,24 +43,24 @@ namespace Assets.Scripts.AI {
         /// The swaying offset that will be applied to a center point
         /// </summary>
         /// <returns></returns>
-        Vector3 UpdateAmble() {
+        private Vector3 UpdateAmble() {
             var t = Time.time;
-            var xMax = Mathf.Lerp(GameController.Instance.MalletAIAmbleX.x, GameController.Instance.MalletAIAmbleX.y, ctx.Riskyness.Value);
+            var xMax = Mathf.Lerp(GameController.Instance.MalletAIAmbleX.x, GameController.Instance.MalletAIAmbleX.y, Ctx.Riskyness.Value);
             var yMax = GameController.Instance.MalletAIAmbleY;
             var x = Mathf.Sin(t / ambleOscillateTime ) * xMax;
             var y = Mathf.Sin(t / ambleOscillateTime * 2) * yMax; // x2 to create a figure-eight pattern
             return new Vector3(x, 0, y);
         }
 
-        Vector3 GetAmbleCenter() {
-            var offset = 0.5f; // distance out from the goal / centerline to amble
-            var unconfidentEnd = ctx.AIGoalPos + (ctx.ArenaCenterPos - ctx.AIGoalPos).normalized * offset;
-            var confidentEnd = ctx.ArenaCenterPos + (ctx.AIGoalPos - ctx.ArenaCenterPos).normalized * offset;
-            var ambleLocation = Vector3.Lerp(unconfidentEnd, confidentEnd, ctx.Riskyness.Value);
+        private Vector3 GetAmbleCenter() {
+            const float offset = 0.5f; // distance out from the goal / center-line to amble
+            var unconfidentEnd = Ctx.AIGoalPos + (Ctx.ArenaCenterPos - Ctx.AIGoalPos).normalized * offset;
+            var confidentEnd = Ctx.ArenaCenterPos + (Ctx.AIGoalPos - Ctx.ArenaCenterPos).normalized * offset;
+            var ambleLocation = Vector3.Lerp(unconfidentEnd, confidentEnd, Ctx.Riskyness.Value);
 
             // this might be better as a different state (position behind puck)
-            if (ambleLocation.z < ctx.Puck.Rb.position.z) {
-                ambleLocation = new Vector3(ambleLocation.x, ambleLocation.y, ctx.Puck.Rb.position.z + ctx.AiMallet.Radius);
+            if (ambleLocation.z < Ctx.Puck.Rb.position.z) {
+                ambleLocation = new Vector3(ambleLocation.x, ambleLocation.y, Ctx.Puck.Rb.position.z + Ctx.AiMallet.Radius);
             }
 
             return ambleLocation;

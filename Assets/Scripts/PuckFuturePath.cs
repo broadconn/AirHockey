@@ -33,7 +33,7 @@ namespace Assets {
         private void Update() { 
             DoFutureCastAgainstRed();
 
-            if (GameController.Instance.Debug) {
+            if (GameController.Instance.debug) {
                 DrawFuturePathLines();
                 ShowClosestPoint();
                 ShowChosenPoint();
@@ -121,7 +121,7 @@ namespace Assets {
 
                 lastSegIsTowardsRedZone = thisSegIsTowardsRedZone;
 
-                var pos = GetClosestPointOnLineAB(seg.pointA.point, seg.pointB.point, samplePoint);
+                var pos = GetClosestPointOnLine((seg.pointA.point, seg.pointB.point), samplePoint);
                 var dist = Vector3.Distance(samplePoint, pos);
                 if (dist < closestDist2) {
                     closestDist2 = dist;
@@ -138,17 +138,17 @@ namespace Assets {
             return (closestPos, time);
         }
 
-        private Vector3 GetClosestPointOnLineAB(Vector3 a, Vector3 b, Vector3 point) {
-            Vector3 a_to_p = point - a;        
-            Vector3 a_to_b = b - a;      
+        private static Vector3 GetClosestPointOnLine((Vector3 start, Vector3 end) line, Vector3 point) {
+            var startToPoint = point - line.start;        
+            var startToEnd = line.end - line.start;      
 
-            float lineSqLength = Vector3.SqrMagnitude(a_to_b);
-            float dotABAP = Vector3.Dot(a_to_p, a_to_b); 
-            float distance = dotABAP / lineSqLength;
+            var lineSqLength = Vector3.SqrMagnitude(startToEnd);
+            var dotABAP = Vector3.Dot(startToPoint, startToEnd); 
+            var distance = dotABAP / lineSqLength;
             var pointOnLine = 
-                distance < 0 ? a : 
-                distance > 1 ? b : 
-                a + a_to_b * distance;
+                distance < 0 ? line.start : 
+                distance > 1 ? line.end : 
+                line.start + startToEnd * distance;
 
             return pointOnLine;
         }

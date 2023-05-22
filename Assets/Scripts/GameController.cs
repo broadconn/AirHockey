@@ -1,91 +1,92 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GameController : MonoBehaviour {
-    private static GameController _instance;
-    public static GameController Instance { get { return _instance; } }
+    public static GameController Instance { get; private set; }
+
     public event EventHandler<GoalScoredEventArgs> GoalScoredEvent;
 
     [Header("Puck Settings")]
-    [SerializeField] float puckMaxSpeed = 20;
-    public float PuckMaxSpeed { get => puckMaxSpeed; }
+    [SerializeField] private float puckMaxSpeed = 20;
+    public float PuckMaxSpeed => puckMaxSpeed;
 
-    [SerializeField] float puckMinSpeed = 2;
-    public float PuckMinSpeed { get => puckMinSpeed; }
+    [SerializeField] private float puckMinSpeed = 2;
+    public float PuckMinSpeed => puckMinSpeed;
 
     [Header("Player Settings")]
-    [SerializeField] float malletPlayerMaxSpeed = 40;
-    public float MalletPlayerMaxSpeed { get => malletPlayerMaxSpeed; }
+    [SerializeField] private float malletPlayerMaxSpeed = 40;
+    public float MalletPlayerMaxSpeed => malletPlayerMaxSpeed;
 
     [Header("AI Settings")]
-    [SerializeField] float malletAIMaxSpeed = 10;
-    public float MalletAIMaxSpeed { get => malletAIMaxSpeed; }
+    [SerializeField] private float malletAIMaxSpeed = 10;
+    public float MalletAIMaxSpeed => malletAIMaxSpeed;
 
-    [SerializeField] float malletAiMaxSpeedToStillChasePuck = 4f;
-    public float MalletAiMaxSpeedToStillChasePuck { get => malletAiMaxSpeedToStillChasePuck; }
+    [SerializeField] private float malletAiMaxSpeedToStillChasePuck = 4f;
+    public float MalletAiMaxSpeedToStillChasePuck => malletAiMaxSpeedToStillChasePuck;
 
-    [SerializeField] float malletAiStrikeDistance = 0.5f;
-    public float MalletAiStrikeDistance { get => malletAiStrikeDistance; }
+    [SerializeField] private float malletAiStrikeDistance = 0.5f;
+    public float MalletAiStrikeDistance => malletAiStrikeDistance;
 
-    [SerializeField] float malletAiStrikeForce = 5f;
-    public float MalletAiStrikeForce { get => malletAiStrikeForce; }
+    [SerializeField] private float malletAiStrikeForce = 5f;
+    public float MalletAiStrikeForce => malletAiStrikeForce;
 
-    [SerializeField] float malletAiStrikeTime = 0.5f;
-    public float MalletAiStrikeTime { get => malletAiStrikeTime; }
+    [SerializeField] private float malletAiStrikeTime = 0.5f;
+    public float MalletAiStrikeTime => malletAiStrikeTime;
 
-    [SerializeField] AnimationCurve malletAIStrikeCurve;
-    public AnimationCurve MalletAIStrikeCurve { get => malletAIStrikeCurve; }
+    [SerializeField] private AnimationCurve malletAIStrikeCurve;
+    public AnimationCurve MalletAIStrikeCurve => malletAIStrikeCurve;
 
-    public int LastPlayerScored { get; set; }
+    private int LastPlayerScored { get; set; }
 
 
     /// <summary>
     /// Amble range at low confidence (close to the goal) vs when confidence is high
     /// </summary>
-    [SerializeField] Vector2 malletAIAmbleX = new(0.1f, 1f);
-    public Vector2 MalletAIAmbleX { get => malletAIAmbleX; }
+    [SerializeField] private Vector2 malletAIAmbleX = new(0.1f, 1f);
+    public Vector2 MalletAIAmbleX => malletAIAmbleX;
 
-    [SerializeField] float malletAIAmbleY = 0.1f;
-    public float MalletAIAmbleY { get => malletAIAmbleY; } 
+    [SerializeField] private float malletAIAmbleY = 0.1f;
+    public float MalletAIAmbleY => malletAIAmbleY;
 
     [Header("References")]
-    [SerializeField] Puck puck;
-    [SerializeField] PlayerMallet player;
-    [SerializeField] AIMallet aiMallet;
-    [SerializeField] Transform p1PuckSpawnPos;
-    [SerializeField] Transform p2PuckSpawnPos;
-    [SerializeField] ScoreText p1ScoreText;
-    [SerializeField] ScoreText p2ScoreText;
+    [SerializeField] private Puck puck;
+    [SerializeField] private PlayerMallet player;
+    [SerializeField] private AIMallet aiMallet;
+    [SerializeField] private Transform p1PuckSpawnPos;
+    [SerializeField] private Transform p2PuckSpawnPos;
+    [SerializeField] private ScoreText p1ScoreText;
+    [SerializeField] private ScoreText p2ScoreText;
 
     [Header("Debug")]
-    public bool Debug = false;
+    public bool debug = false;
 
     public int P1Score { get; private set; }
     public int P2Score { get; private set; }
 
     private void Awake() {
-        _instance = _instance != null ? _instance : this;
+        Instance = Instance != null ? Instance : this;
     }
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         PrepareForNewGame();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         CheckForDebugChange();
     }
 
-    void CheckForDebugChange() {
+    private void CheckForDebugChange() {
         if (Input.GetKeyDown(KeyCode.BackQuote)) {
-            Debug = !Debug;
+            debug = !debug;
         }
     }
 
-    void PrepareForNewGame() {
+    private void PrepareForNewGame() {
         P1Score = 0;
         P2Score = 0;
         LastPlayerScored = 2; // set to opposite of the player that should start
@@ -104,13 +105,13 @@ public class GameController : MonoBehaviour {
         ResetForNewRound();
     } 
 
-    void ResetForNewRound() {
+    private void ResetForNewRound() {
         var playerServing = LastPlayerScored != 1;
         puck.ResetForNewRound(playerServing);
         aiMallet.ResetForNewRound(!playerServing);
     }
 
-    void UpdateScoreText() {
+    private void UpdateScoreText() {
         p1ScoreText.UpdateScore(P1Score);
         p2ScoreText.UpdateScore(P2Score);
     }

@@ -59,7 +59,7 @@ public class AIMallet : MonoBehaviour {
 
         ConstrainDesiredPosToMesh();
 
-        if (GameController.Instance.Debug)
+        if (GameController.Instance.debug)
             DebugStuff();
     }
 

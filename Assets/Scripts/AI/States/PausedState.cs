@@ -13,7 +13,7 @@ namespace Assets.Scripts.AI {
         }
 
         public override Vector3 UpdatePosition() {
-            return ctx.AiMallet.Rb.position;
+            return Ctx.AiMallet.Rb.position;
         }
 
     }

@@ -1,12 +1,11 @@
-﻿using UnityEditor.Rendering.LookDev;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.AI {
     internal abstract class AIState {
-        protected AIContext ctx;
+        protected readonly AIContext Ctx;
 
-        public AIState(AIContext context) {
-            ctx = context;
+        protected AIState(AIContext context) {
+            Ctx = context;
         }
         public abstract void OnEnterState();
         public abstract AIMalletState UpdateState();
